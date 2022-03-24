@@ -44,6 +44,8 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     </properties>
 
+  <!-- Code changes for pull request to master to form new branch -->
+ 
     <build>
         <plugins>
             <!-- Maven Release Plugin -->
