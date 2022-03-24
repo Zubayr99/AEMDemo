@@ -33,25 +33,18 @@ import org.slf4j.LoggerFactory;
 /**
  * Simple servlet filter component that logs incoming requests.
  */
-@Component(service = Filter.class,
-           property = {
-                   Constants.SERVICE_DESCRIPTION + "=Demo to filter incoming requests",
-                   EngineConstants.SLING_FILTER_SCOPE + "=" + EngineConstants.FILTER_SCOPE_REQUEST,
-                   Constants.SERVICE_RANKING + ":Integer=-700"
+@Component(service = Filter.class, property = {Constants.SERVICE_DESCRIPTION + "=Demo to filter incoming requests", EngineConstants.SLING_FILTER_SCOPE + "=" + EngineConstants.FILTER_SCOPE_REQUEST, Constants.SERVICE_RANKING + ":Integer=-700"
 
-           })
+})
 public class LoggingFilter implements Filter {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Override
-    public void doFilter(final ServletRequest request, final ServletResponse response,
-                         final FilterChain filterChain) throws IOException, ServletException {
+    public void doFilter(final ServletRequest request, final ServletResponse response, final FilterChain filterChain) throws IOException, ServletException {
 
         final SlingHttpServletRequest slingRequest = (SlingHttpServletRequest) request;
-        logger.debug("request for {}, with selector {}", slingRequest
-                .getRequestPathInfo().getResourcePath(), slingRequest
-                .getRequestPathInfo().getSelectorString());
+        logger.debug("request for {}, with selector {}", slingRequest.getRequestPathInfo().getResourcePath(), slingRequest.getRequestPathInfo().getSelectorString());
 
         filterChain.doFilter(request, response);
     }
@@ -63,7 +56,5 @@ public class LoggingFilter implements Filter {
     @Override
     public void destroy() {
     }
-
-
 
 }
