@@ -1,21 +1,27 @@
 package com.aem.demo.core.dto;
 
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import com.rometools.rome.feed.synd.SyndContent;
+import com.rometools.rome.feed.synd.SyndEnclosure;
+import com.rometools.rome.feed.synd.SyndEntry;
+import lombok.Data;
 
 import java.util.Date;
+import java.util.List;
 
-@Getter
-@Setter
-@AllArgsConstructor
-@ToString
+@Data
 public class NewsCard {
     private String topic;
-    private String article;
+    private SyndContent article;
     private String link;
     private Date pubDate;
-    private String image;
+    private List<SyndEnclosure> image;
+
+    public NewsCard(SyndEntry syndEntry) {
+        this.topic = syndEntry.getTitle();
+        this.article = syndEntry.getDescription();
+        this.link = syndEntry.getLink();
+        this.pubDate = syndEntry.getPublishedDate();
+        this.image = syndEntry.getEnclosures();
+    }
 }

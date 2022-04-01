@@ -5,7 +5,7 @@ import org.osgi.service.metatype.annotations.AttributeType;
 import org.osgi.service.metatype.annotations.ObjectClassDefinition;
 
 @ObjectClassDefinition(
-        name = "AEM Geeks - Scheduler Configuration",
+        name = "AEM Demo - Scheduler Configuration",
         description = "Sling scheduler configuration"
 )
 public @interface SchedulerConfiguration {
