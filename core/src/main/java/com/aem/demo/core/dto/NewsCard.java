@@ -1,27 +1,25 @@
 package com.aem.demo.core.dto;
 
 
-import com.rometools.rome.feed.synd.SyndContent;
 import com.rometools.rome.feed.synd.SyndEnclosure;
 import com.rometools.rome.feed.synd.SyndEntry;
 import lombok.Data;
 
 import java.util.Date;
-import java.util.List;
 
 @Data
 public class NewsCard {
     private String topic;
-    private SyndContent article;
+    private String article;
     private String link;
     private Date pubDate;
-    private List<SyndEnclosure> image;
+    private String image;
 
     public NewsCard(SyndEntry syndEntry) {
         this.topic = syndEntry.getTitle();
-        this.article = syndEntry.getDescription();
+        this.article = syndEntry.getDescription().getValue();
         this.link = syndEntry.getLink();
         this.pubDate = syndEntry.getPublishedDate();
-        this.image = syndEntry.getEnclosures();
+        this.image = syndEntry.getEnclosures().stream().map(SyndEnclosure::getUrl).findFirst().orElse("Value is null");
     }
 }

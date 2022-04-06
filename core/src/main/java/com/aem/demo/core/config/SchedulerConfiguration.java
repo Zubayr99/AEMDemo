@@ -13,13 +13,11 @@ public @interface SchedulerConfiguration {
     @AttributeDefinition(
             name = "Scheduler name",
             description = "Name of the scheduler",
-            type = AttributeType.STRING)
-    public String schedulerName() default "Custom Sling Scheduler Configuration";
+            type = AttributeType.STRING) String schedulerName() default "Custom Sling Scheduler Configuration";
 
     @AttributeDefinition(
             name = "Cron Expression",
             description = "Cron expression used by the scheduler",
-            type = AttributeType.STRING)
-    public String cronExpression() default "0 0 12 1/1 * ? *"; // runs every 24 hours at 12:00
+            type = AttributeType.STRING) String cronExpression() default "0 0 12 1/1 * ? *"; // runs every 24 hours at 12:00
 }
 
