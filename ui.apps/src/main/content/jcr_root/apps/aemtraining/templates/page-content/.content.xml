@@ -3,7 +3,7 @@
     jcr:description="Template with focus on content."
     jcr:primaryType="cq:Template"
     jcr:title="AEMDemoSite Content Page"
-          allowedPaths="[/content/aemtraining/us/en/.+,/content/aemtraining/us/en/home/.+,/content/aemtraining/.+]"
+          allowedPaths="[/content/aemtraining/.+]"
     ranking="{Long}100">
     <jcr:content
             jcr:primaryType="cq:PageContent"
