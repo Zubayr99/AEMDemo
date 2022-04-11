@@ -3,4 +3,5 @@
     <filter root="/conf/aemtraining"/>
     <filter root="/content/aemtraining"/>
     <filter root="/content/dam/aemtraining"/>
+    <filter root="/content/dam/aemtraining"/>
 </workspaceFilter>
