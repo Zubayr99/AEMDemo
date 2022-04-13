@@ -7,7 +7,7 @@
         cq:template="/conf/aemtraining/settings/wcm/templates/content-page"
         jcr:primaryType="cq:PageContent"
         jcr:title="en"
-        sling:resourceType="aemtraining/components/page"
+        sling:resourceType="aemtraining/components/structure/page"
         pageTitle="AEM DEMO">
         <root
             jcr:primaryType="nt:unstructured"

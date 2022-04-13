@@ -20,6 +20,6 @@ public class NewsCard {
         this.article = syndEntry.getDescription().getValue();
         this.link = syndEntry.getLink();
         this.pubDate = syndEntry.getPublishedDate();
-        this.image = syndEntry.getEnclosures().stream().map(SyndEnclosure::getUrl).findFirst().orElse("Value is null");
+        this.image = syndEntry.getEnclosures().stream().map(SyndEnclosure::getUrl).findFirst().orElse("");
     }
 }

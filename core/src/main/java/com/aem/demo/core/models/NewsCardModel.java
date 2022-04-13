@@ -12,34 +12,30 @@ import java.util.Date;
 @Model(adaptables = SlingHttpServletRequest.class,
         resourceType = NewsCardModel.RESOURCE_TYPE,
         defaultInjectionStrategy = DefaultInjectionStrategy.OPTIONAL)
+@Getter
 public class NewsCardModel {
 
     protected static final String RESOURCE_TYPE = "aemtraining/components/content/newscard";
+    public static final String DEFAULT_IMAGE = "https://redzonekickboxing.com/wp-content/uploads/2017/04/default-image.jpg";
 
 
-    @Getter
     @ValueMapValue
     @Default(values = "topic")
     public String topic;
 
-    @Getter
     @ValueMapValue
     @Default(values = "article")
     public String article;
 
-    @Getter
     @ValueMapValue
     @Default(values = "link")
     public String link;
 
-    @Getter
     @ValueMapValue
     public Date pubDate;
 
-    @Getter
     @ValueMapValue
-    @Default(values = "https://redzonekickboxing.com/wp-content/uploads/2017/04/default-image.jpg")
+    @Default(values = DEFAULT_IMAGE)
     public String image;
-
 
 }
