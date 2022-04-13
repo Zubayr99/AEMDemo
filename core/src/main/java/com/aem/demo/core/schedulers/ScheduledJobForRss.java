@@ -51,5 +51,6 @@ public class ScheduledJobForRss implements Runnable {
     @Override
     public void run() {
         List<NewsCard> cards = rssFeedService.readFeed();
+        rssFeedService.saveRssFeedNodes(cards);
     }
 }

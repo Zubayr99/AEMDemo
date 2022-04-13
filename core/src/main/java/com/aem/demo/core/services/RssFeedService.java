@@ -6,4 +6,6 @@ import java.util.List;
 
 public interface RssFeedService {
     List<NewsCard> readFeed();
+
+    String saveRssFeedNodes(List<NewsCard> cardList);
 }

@@ -1,11 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jcr:root xmlns:sling="http://sling.apache.org/jcr/sling/1.0" xmlns:cq="http://www.day.com/jcr/cq/1.0" xmlns:jcr="http://www.jcp.org/jcr/1.0"
-    jcr:primaryType="cq:Page">
+<jcr:root xmlns:sling="http://sling.apache.org/jcr/sling/1.0" xmlns:cq="http://www.day.com/jcr/cq/1.0"
+          xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:nt="http://www.jcp.org/jcr/nt/1.0"
+          jcr:primaryType="cq:Page">
     <jcr:content
-        cq:redirectTarget="/content/aemtraining/us/en"
-        cq:template="/conf/aemtraining/settings/wcm/templates/content-page"
-        jcr:primaryType="cq:PageContent"
-        jcr:title="us"
-        sling:resourceType="foundation/components/redirect"/>
+            cq:redirectTarget="/content/aemtraining/us/en"
+            cq:template="/conf/aemtraining/settings/wcm/templates/content-page"
+            jcr:mixinTypes="[cq:LiveSync]"
+            jcr:primaryType="cq:PageContent"
+            jcr:title="us"
+            sling:resourceType="foundation/components/redirect">
+        <cq:LiveSyncConfig
+                cq:isDeep="{Boolean}false"
+                cq:master="/content/aemtraining/language-masters"
+                cq:rolloutConfigs="[/libs/msm/wcm/rolloutconfigs/default]"
+                jcr:primaryType="cq:LiveCopy"/>
+    </jcr:content>
     <en/>
 </jcr:root>
+

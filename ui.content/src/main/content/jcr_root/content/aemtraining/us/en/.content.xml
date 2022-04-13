@@ -5,26 +5,32 @@
         cq:contextHubPath="/etc/cloudsettings/default/contexthub"
         cq:contextHubSegmentsPath="/etc/segmentation/contexthub"
         cq:template="/conf/aemtraining/settings/wcm/templates/content-page"
+        jcr:mixinTypes="[cq:LiveRelationship,cq:LiveSync]"
         jcr:primaryType="cq:PageContent"
         jcr:title="en"
         sling:resourceType="aemtraining/components/structure/page"
         pageTitle="AEM DEMO">
         <root
-            jcr:primaryType="nt:unstructured"
-            sling:resourceType="aemtraining/components/container"
+                jcr:mixinTypes="[cq:LiveRelationship,cq:LiveSync]"
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="aemtraining/components/container"
             layout="responsiveGrid">
             <container
-                jcr:primaryType="nt:unstructured"
-                sling:resourceType="aemtraining/components/container">
+                    jcr:mixinTypes="[cq:LiveRelationship,cq:LiveSync]"
+                    jcr:primaryType="nt:unstructured"
+                    sling:resourceType="aemtraining/components/container">
                 <title
-                    jcr:primaryType="nt:unstructured"
-                    sling:resourceType="aemtraining/components/title"/>
+                        jcr:mixinTypes="[cq:LiveRelationship,cq:LiveSync]"
+                        jcr:primaryType="nt:unstructured"
+                        sling:resourceType="aemtraining/components/title"/>
                 <container
-                    jcr:primaryType="nt:unstructured"
-                    sling:resourceType="aemtraining/components/container"
+                        jcr:mixinTypes="[cq:LiveRelationship,cq:LiveSync]"
+                        jcr:primaryType="nt:unstructured"
+                        sling:resourceType="aemtraining/components/container"
                     layout="responsiveGrid">
                     <teaser
                         jcr:description="&lt;p>Don't stop half way, go for the top!&lt;/p>&#xd;&#xa;"
+                        jcr:mixinTypes="[cq:LiveRelationship,cq:LiveSync]"
                         jcr:primaryType="nt:unstructured"
                         jcr:title="Epic Journey"
                         sling:resourceType="aemtraining/components/teaser"
@@ -32,15 +38,19 @@
                         descriptionFromPage="false"
                         textIsRich="true"
                         titleFromPage="false">
-                        <cq:responsive jcr:primaryType="nt:unstructured">
+                        <cq:responsive
+                                jcr:mixinTypes="[cq:LiveRelationship,cq:LiveSync]"
+                                jcr:primaryType="nt:unstructured">
                             <default
-                                jcr:primaryType="nt:unstructured"
-                                offset="0"
-                                width="4"/>
+                                    jcr:mixinTypes="[cq:LiveRelationship,cq:LiveSync]"
+                                    jcr:primaryType="nt:unstructured"
+                                    offset="0"
+                                    width="4"/>
                         </cq:responsive>
                     </teaser>
                     <teaser_copy
                         jcr:description="&lt;p>Don't stop half way, go for the top!&lt;/p>&#xd;&#xa;"
+                        jcr:mixinTypes="[cq:LiveRelationship,cq:LiveSync]"
                         jcr:primaryType="nt:unstructured"
                         jcr:title="Epic Journey"
                         sling:resourceType="aemtraining/components/teaser"
@@ -48,15 +58,19 @@
                         descriptionFromPage="false"
                         textIsRich="true"
                         titleFromPage="false">
-                        <cq:responsive jcr:primaryType="nt:unstructured">
+                        <cq:responsive
+                                jcr:mixinTypes="[cq:LiveRelationship,cq:LiveSync]"
+                                jcr:primaryType="nt:unstructured">
                             <default
-                                jcr:primaryType="nt:unstructured"
-                                offset="0"
-                                width="4"/>
+                                    jcr:mixinTypes="[cq:LiveRelationship,cq:LiveSync]"
+                                    jcr:primaryType="nt:unstructured"
+                                    offset="0"
+                                    width="4"/>
                         </cq:responsive>
                     </teaser_copy>
                     <teaser_copy_1579324932
                         jcr:description="&lt;p>Don't stop half way, go for the top!&lt;/p>&#xd;&#xa;"
+                        jcr:mixinTypes="[cq:LiveRelationship,cq:LiveSync]"
                         jcr:primaryType="nt:unstructured"
                         jcr:title="Epic Journey"
                         sling:resourceType="aemtraining/components/teaser"
@@ -64,21 +78,33 @@
                         descriptionFromPage="false"
                         textIsRich="true"
                         titleFromPage="false">
-                        <cq:responsive jcr:primaryType="nt:unstructured">
+                        <cq:responsive
+                                jcr:mixinTypes="[cq:LiveRelationship,cq:LiveSync]"
+                                jcr:primaryType="nt:unstructured">
                             <default
-                                jcr:primaryType="nt:unstructured"
-                                offset="0"
-                                width="4"/>
+                                    jcr:mixinTypes="[cq:LiveRelationship,cq:LiveSync]"
+                                    jcr:primaryType="nt:unstructured"
+                                    offset="0"
+                                    width="4"/>
                         </cq:responsive>
                     </teaser_copy_1579324932>
                     <helloworld
-                        jcr:primaryType="nt:unstructured"
-                        sling:resourceType="aemtraining/components/helloworld"
-                        text="lalala :)"/>
+                            jcr:mixinTypes="[cq:LiveRelationship,cq:LiveSync]"
+                            jcr:primaryType="nt:unstructured"
+                            sling:resourceType="aemtraining/components/helloworld"
+                            text="lalala :)"/>
                 </container>
             </container>
         </root>
+        <cq:LiveSyncConfig
+                cq:isDeep="{Boolean}false"
+                cq:master="/content/aemtraining/language-masters/en"
+                cq:rolloutConfigs="[/libs/msm/wcm/rolloutconfigs/default]"
+                jcr:primaryType="cq:LiveCopy"/>
     </jcr:content>
     <home/>
     <component-info/>
+    <us-newscard jcr:primaryType="nt:unstructured">
+
+    </us-newscard>
 </jcr:root>
