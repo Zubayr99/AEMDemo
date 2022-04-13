@@ -15,8 +15,8 @@ import java.util.Date;
 @Getter
 public class NewsCardModel {
 
-    protected static final String RESOURCE_TYPE = "aemtraining/components/content/newscard";
-    public static final String DEFAULT_IMAGE = "https://redzonekickboxing.com/wp-content/uploads/2017/04/default-image.jpg";
+    static final String RESOURCE_TYPE = "aemtraining/components/content/newscard";
+    private static final String DEFAULT_IMAGE = "https://redzonekickboxing.com/wp-content/uploads/2017/04/default-image.jpg";
 
 
     @ValueMapValue
