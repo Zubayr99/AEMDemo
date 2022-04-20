@@ -16,7 +16,7 @@ import java.util.List;
 @Slf4j
 @Component(immediate = true, service = Runnable.class)
 @Designate(ocd = SchedulerConfiguration.class)
-public class ScheduledJobForRss implements Runnable {
+public class ScheduledRssJob implements Runnable {
 
     private String schedulerName;
 

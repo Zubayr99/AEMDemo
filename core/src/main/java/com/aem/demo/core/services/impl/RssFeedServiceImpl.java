@@ -2,7 +2,10 @@ package com.aem.demo.core.services.impl;
 
 import com.aem.demo.core.dto.NewsCard;
 import com.aem.demo.core.services.RssFeedService;
+import com.aem.demo.core.utils.ImageRetrieverUtil;
 import com.aem.demo.core.utils.ResolverUtil;
+import com.day.cq.wcm.api.Page;
+import com.day.cq.wcm.api.PageManager;
 import com.rometools.rome.feed.synd.SyndFeed;
 import com.rometools.rome.io.FeedException;
 import com.rometools.rome.io.SyndFeedInput;
@@ -14,32 +17,34 @@ import org.apache.sling.api.resource.ResourceResolverFactory;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
-import javax.jcr.Binary;
 import javax.jcr.Node;
 import javax.jcr.Session;
-import javax.jcr.ValueFactory;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static com.adobe.aemds.guide.utils.JcrResourceConstants.CQ_PAGE_CONTENT;
+import static com.adobe.aemds.guide.utils.JcrResourceConstants.SLING_RESOURCE_TYPE_PROPERTY;
+import static com.day.cq.commons.jcr.JcrConstants.JCR_CONTENT;
+import static com.day.cq.commons.jcr.JcrConstants.NT_UNSTRUCTURED;
 
 @Slf4j
 @Component(service = RssFeedService.class, immediate = true)
 public class RssFeedServiceImpl implements RssFeedService {
 
-    private final String NEWSCARDNODE_TYPE= "nt:unstructured";
-    private final String NODE_PATH = "/content/aemtraining/us/en/us-newscard";
+    private final String RENDERER = "aemtraining/components/structure/home";
+    private final String TEMPLATE = "/apps/aemtraining/templates/page-home";
+    private final String NODE_PATH = "/content/aemtraining/language-masters/en";
 
     @Reference
-    ResourceResolverFactory resourceResolverFactory;
+    private ResourceResolverFactory resourceResolverFactory;
 
     @Override
     public List<NewsCard> readFeed() {
         SyndFeedInput input = new SyndFeedInput();
-        SyndFeed feed = null;
+        SyndFeed feed;
         try {
             URL feedUrl = new URL("https://www.nasa.gov/rss/dyn/educationnews.rss");
             feed = input.build(new XmlReader(feedUrl));
@@ -47,91 +52,78 @@ public class RssFeedServiceImpl implements RssFeedService {
             log.error("Exception during reading news feed", e);
             return Collections.emptyList();
         }
-
-        return feed.getEntries().stream().map(NewsCard::new)
-                .collect(Collectors.toList());
+        return feed.getEntries().stream().map(NewsCard::new).collect(Collectors.toList());
     }
 
     @Override
     public String saveRssFeedNodes(List<NewsCard> cardList) {
-        String nodeCreated= StringUtils.EMPTY;
-        try {
-            ResourceResolver resolver = ResolverUtil.newResolver(resourceResolverFactory);
+        String nodeCreated = StringUtils.EMPTY;
+        try (ResourceResolver resolver = ResolverUtil.newResolver(resourceResolverFactory)) {
             Session session = resolver.adaptTo(Session.class);
 
-            if (session.nodeExists(NODE_PATH)){
-                nodeCreated = addNewsCardNode(session, cardList);
+            if (session.nodeExists(NODE_PATH + "/newscard-nodes")) {
+                nodeCreated = createPage(cardList, resolver);
             } else {
                 addParentNode(session);
-                nodeCreated = addNewsCardNode(session, cardList);
+                nodeCreated = createPage(cardList, resolver);
+
             }
 
         } catch (Exception e) {
-            log.error("\n Error while creating node - {} ",e.getMessage());
+            log.error("\n Error while creating node - {} ", e.getMessage());
         }
         return nodeCreated;
     }
 
-    private int count = 0;
 
-    private String addNewsCardNode(Session session, List<NewsCard> list){
-
+    private String addParentNode(Session session) {
         try {
-            for (NewsCard elm:list) {
-                count++;
-                String nodeName= count + " newscard_node";
-                Node node = session.getNode(NODE_PATH);
-                Node cardNode = node.addNode(nodeName, NEWSCARDNODE_TYPE);
-                cardNode.setProperty("topic", elm.getTopic());
-                cardNode.setProperty("article", elm.getArticle());
-                cardNode.setProperty("link", elm.getLink());
-                cardNode.setProperty("pubDate", String.valueOf(elm.getPubDate()));
-                cardNode.setProperty("image", elm.getImage());
-                saveImage(cardNode, elm.getImage());
-                session.save();
-            }
-
-
-        } catch (Exception e) {
-            log.error("\n Error while creating NewsCard node ");
-        }
-        return null;
-    }
-
-    private String addParentNode(Session session){
-        try {
-            if(session.nodeExists("/content/aemtraining/us/en")){
-                Node gParentNode=session.getNode("/content/aemtraining/us/en");
-                Node parentNode=gParentNode.addNode("us-newscard",NEWSCARDNODE_TYPE);
+            if (session.nodeExists(NODE_PATH)) {
+                Node parentNodePath = session.getNode(NODE_PATH);
+                Node parentNode = parentNodePath.addNode("newscard-nodes", NT_UNSTRUCTURED);
                 session.save();
                 return parentNode.getName();
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error("\n Error while creating Parent node ");
         }
         return null;
     }
 
-    private boolean saveImage(Node node, String link) {
-        try {
-            ResourceResolver resourceResolver = ResolverUtil.newResolver(resourceResolverFactory);
+    private String createPage(List<NewsCard> newsCardList, ResourceResolver resolver) {
 
-            URL url = new URL(link);
-            URLConnection connection = url.openConnection();
-            InputStream stream = connection.getInputStream();
-            Session session=resourceResolver.adaptTo(Session.class);
-            ValueFactory valueFactory=session.getValueFactory();
-            Binary imageBinary = valueFactory.createBinary(stream);
-            Node photo=node.addNode("photo","sling:Folder");
-            Node file=photo.addNode("image","nt:file");
-            Node content = file.addNode("jcr:content", "nt:resource");
-            content.setProperty("jcr:mimeType", "image/jpeg");
-            content.setProperty("jcr:data", imageBinary);
+        Page prodPage;
+        try {
+            Session session = resolver.adaptTo(Session.class);
+            if (session != null) {
+                for (NewsCard newsCard : newsCardList) {
+                    PageManager pageManager = resolver.adaptTo(PageManager.class);
+                    String pageName = "newspage";
+                    String pageTitle = "NewsCard Page";
+                    prodPage = pageManager.create(NODE_PATH + "/newscard-nodes", pageName, TEMPLATE, pageTitle);
+                    Node pageNode = prodPage.adaptTo(Node.class);
+
+                    Node jcrNode;
+                    if (prodPage.hasContent()) {
+                        jcrNode = prodPage.getContentResource().adaptTo(Node.class);
+                    } else {
+                        jcrNode = pageNode.addNode(JCR_CONTENT, CQ_PAGE_CONTENT);
+                    }
+                    jcrNode.setProperty(SLING_RESOURCE_TYPE_PROPERTY, RENDERER);
+                    jcrNode.setProperty("topic", newsCard.getTopic());
+                    jcrNode.setProperty("article", newsCard.getArticle());
+                    jcrNode.setProperty("link", newsCard.getLink());
+                    jcrNode.setProperty("pubDate", String.valueOf(newsCard.getPubDate()));
+                    jcrNode.setProperty("image", newsCard.getImage());
+                    ImageRetrieverUtil.retrieveImages(jcrNode, newsCard.getLink(), resolver);
+                    session.save();
+                }
+            }
 
         } catch (Exception e) {
-            log.info("\n ERROR while saving images - {} ",e.getMessage());
+            log.error("\n Error while creating NewsCard page! ");
         }
-        return false;
+        return null;
     }
 
 }

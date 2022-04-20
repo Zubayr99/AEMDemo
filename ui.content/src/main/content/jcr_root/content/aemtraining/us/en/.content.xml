@@ -104,7 +104,4 @@
     </jcr:content>
     <home/>
     <component-info/>
-    <us-newscard jcr:primaryType="nt:unstructured">
-
-    </us-newscard>
 </jcr:root>
