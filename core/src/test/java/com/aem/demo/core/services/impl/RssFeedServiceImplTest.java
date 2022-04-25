@@ -12,6 +12,6 @@ public class RssFeedServiceImplTest extends TestCase {
     private TestLogger logger = TestLoggerFactory.getTestLogger(rssFeedService.getClass());
 
     public void testReadFeed() {
-        rssFeedService.readFeed().forEach(System.out::println);
+        rssFeedService.importData().forEach(System.out::println);
     }
 }

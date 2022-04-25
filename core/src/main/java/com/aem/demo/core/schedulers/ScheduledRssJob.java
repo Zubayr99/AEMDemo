@@ -1,7 +1,6 @@
 package com.aem.demo.core.schedulers;
 
 import com.aem.demo.core.config.SchedulerConfiguration;
-import com.aem.demo.core.dto.NewsCard;
 import com.aem.demo.core.services.RssFeedService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.sling.commons.scheduler.ScheduleOptions;
@@ -11,8 +10,6 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.metatype.annotations.Designate;
-
-import java.util.List;
 @Slf4j
 @Component(immediate = true, service = Runnable.class)
 @Designate(ocd = SchedulerConfiguration.class)
@@ -50,7 +47,6 @@ public class ScheduledRssJob implements Runnable {
 
     @Override
     public void run() {
-        List<NewsCard> cards = rssFeedService.readFeed();
-        rssFeedService.saveRssFeedNodes(cards);
+        rssFeedService.importData();
     }
 }

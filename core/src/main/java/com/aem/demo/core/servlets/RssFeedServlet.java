@@ -1,6 +1,5 @@
 package com.aem.demo.core.servlets;
 
-import com.aem.demo.core.dto.NewsCard;
 import com.aem.demo.core.services.RssFeedService;
 import org.apache.sling.api.SlingHttpServletRequest;
 import org.apache.sling.api.SlingHttpServletResponse;
@@ -12,7 +11,6 @@ import org.osgi.service.component.annotations.Reference;
 
 import javax.servlet.Servlet;
 import java.io.IOException;
-import java.util.List;
 
 @Component(service = Servlet.class,
         property = {
@@ -31,8 +29,7 @@ public class RssFeedServlet extends SlingSafeMethodsServlet {
     protected void doGet(final SlingHttpServletRequest request,
                           final SlingHttpServletResponse response) throws IOException {
         response.setContentType("application/json");
-        List<NewsCard> newsCardList = rssFeedService.readFeed();
-        rssFeedService.saveRssFeedNodes(newsCardList);
+        rssFeedService.importData();
         response.getWriter().write("======RSS FEED UPDATED========");
 
     }
