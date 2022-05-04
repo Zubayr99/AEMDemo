@@ -28,9 +28,9 @@ public class RssFeedServlet extends SlingSafeMethodsServlet {
     @Override
     protected void doGet(final SlingHttpServletRequest request,
                           final SlingHttpServletResponse response) throws IOException {
-        response.setContentType("application/json");
+        response.setContentType("text/html");
         rssFeedService.importData();
-        response.getWriter().write("======RSS FEED UPDATED========");
+        response.getWriter().write("RSS FEED UPDATED");
 
     }
 }
