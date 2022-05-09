@@ -1,13 +1,15 @@
-<div data-sly-use.newscard="com.aem.demo.core.models.Impl.NewsCardModel"></div>
+<sly data-sly-use.newscard="com.aem.demo.core.models.NewsCardModel"></sly>
 
-    <div>Topic :  ${newscard.topic @ context='html'}</div>
-    <div>Article :  ${newscard.article @ context='html'}</div>
-    <div>Link:  ${newscard.link}</div>
-    <div>Published Date :  ${newscard.pubDate @ context='html'}</div>
-    <div>Image Enclosures :  ${newscard.image @ context='html'}</div>
-
-
-
-
-
-
+<div class="container">
+    <div class="text_h1"><h1>${newscard.topic}</h1></div>
+    <div class="wrapper">
+        <div class="box">
+            <img src="${newscard.image}" alt="">
+        </div>
+        <div class="box text">
+            <h5>${newscard.pubDate}</h5>
+            <h3>${newscard.article}</h3>
+            <a href="${newscard.link}" target="_blank">Read more on NASA.com</a>
+        </div>
+    </div>
+</div>

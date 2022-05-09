@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <workspaceFilter version="1.0">
     <filter root="/conf/aemtraining"/>
-    <filter root="/content/aemtraining"/>
-    <filter root="/content/dam/aemtraining"/>
-    <filter root="/content/dam/aemtraining"/>
+    <filter mode="update" root="/content/aemtraining"/>
+    <filter  root="/content/dam/aemtraining"/>
+<!--    <filter mode="update" root="/content/aemtraining/language-masters/en/newscard-nodes"/>-->
 </workspaceFilter>
