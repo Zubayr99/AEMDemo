@@ -22,22 +22,22 @@ public class NewsCardModel {
 
     @ValueMapValue
     @Default(values = "topic")
-    public String topic;
+    private String topic;
 
     @ValueMapValue
     @Default(values = "article")
-    public String article;
+    private String article;
 
     @ValueMapValue
     @Default(values = "link")
-    public String link;
+    private String link;
 
     @ValueMapValue
-    public String pubDate;
+    private String pubDate;
 
     @ValueMapValue
     @Default(values = DEFAULT_IMAGE)
-    public String image;
+    private String image;
 
     public String getPath() {
         return resource.getPath().replace("/jcr:content","");

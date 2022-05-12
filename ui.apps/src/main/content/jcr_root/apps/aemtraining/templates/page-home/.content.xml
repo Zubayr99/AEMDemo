@@ -7,5 +7,5 @@
     ranking="{Long}100">
     <jcr:content
             jcr:primaryType="cq:PageContent"
-            sling:resourceType="aemtraining/components/structure/home"/>
+            sling:resourceType="aemtraining/components/structure/gridpage"/>
 </jcr:root>

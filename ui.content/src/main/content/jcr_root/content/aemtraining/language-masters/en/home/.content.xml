@@ -7,5 +7,5 @@
         cq:template="/apps/aemtraining/templates/page-home"
         jcr:primaryType="cq:PageContent"
         jcr:title="Home"
-        sling:resourceType="aemtraining/components/structure/home"/>
+        sling:resourceType="aemtraining/components/structure/gridpage"/>
 </jcr:root>

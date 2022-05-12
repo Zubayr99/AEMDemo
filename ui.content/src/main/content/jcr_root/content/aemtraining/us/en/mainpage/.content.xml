@@ -10,8 +10,8 @@
             cq:template="/apps/aemtraining/templates/page-home"
             jcr:mixinTypes="[cq:LiveRelationship,cq:LiveSync]"
             jcr:primaryType="cq:PageContent"
-            jcr:title="Home Page"
-            sling:resourceType="aemtraining/components/structure/home">
+            jcr:title="Grid Page"
+            sling:resourceType="aemtraining/components/structure/gridpage">
         <parsys
                 cq:lastRolledout="{Date}2022-01-26T12:44:53.799-05:00"
                 cq:lastRolledoutBy="admin"
