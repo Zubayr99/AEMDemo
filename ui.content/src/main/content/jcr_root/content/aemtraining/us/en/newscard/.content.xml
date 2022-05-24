@@ -10,10 +10,10 @@
         jcr:mixinTypes="[cq:LiveRelationship,cq:LiveSync]"
         jcr:primaryType="cq:PageContent"
         jcr:title="News Card"
-        sling:resourceType="aemtraining/components/structure/home">
+        sling:resourceType="aemtraining/components/structure/gridpage">
         <cq:LiveSyncConfig
                 cq:isDeep="{Boolean}true"
-                cq:master="/content/aemtraining/language-masters/en/home"
+                cq:master="/content/aemtraining/language-masters/en/gridpage"
                 cq:rolloutConfigs="[/libs/msm/wcm/rolloutconfigs/default]"
                 jcr:primaryType="cq:LiveCopy"/>
     </jcr:content>

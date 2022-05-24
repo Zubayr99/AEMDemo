@@ -14,7 +14,7 @@ import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.util.Objects;
+import java.util.Optional;
 
 @Slf4j
 public class ImageRetrieverUtil {
@@ -29,7 +29,7 @@ public class ImageRetrieverUtil {
         try {
             connection = createConnection(link);
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("Exception occurred while creating connection: " + e.getMessage());
         }
         if (connection == null) {
             return false;
@@ -41,14 +41,14 @@ public class ImageRetrieverUtil {
             InputStream stream = connection.getInputStream();
             Files.copy(stream, tempFile, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("Exception occurred while saving data to a temporary file: " + e.getMessage());
         }
 
         String newFile = "/content/dam/aemtraining/" + pageName + "";
         try (InputStream inputstream = new FileInputStream(String.valueOf(tempFile))) {
-            Objects.requireNonNull(resolver.adaptTo(AssetManager.class)).createAsset(newFile, inputstream, contentType, true);
+            Optional.ofNullable(resolver.adaptTo(AssetManager.class)).map(am -> am.createAsset(newFile, inputstream, contentType, true));
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("Exception occurred while creating the asset: " + e.getMessage());
         }
 
         return false;
@@ -56,6 +56,6 @@ public class ImageRetrieverUtil {
 
     @SneakyThrows(MalformedURLException.class)
     private static URLConnection createConnection(String url) throws IOException {
-            return new URL(url).openConnection();
+        return new URL(url).openConnection();
     }
 }

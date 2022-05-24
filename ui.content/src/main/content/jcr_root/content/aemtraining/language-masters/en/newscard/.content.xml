@@ -9,7 +9,7 @@
         cq:template="/apps/aemtraining/templates/page-home"
         jcr:primaryType="cq:PageContent"
         jcr:title="News Card"
-        sling:resourceType="aemtraining/components/structure/home">
+        sling:resourceType="aemtraining/components/structure/gridpage">
 
     </jcr:content>
 </jcr:root>

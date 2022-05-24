@@ -18,12 +18,15 @@ import java.util.Iterator;
 import java.util.List;
 
 @Slf4j
-@Model(adaptables = SlingHttpServletRequest.class, defaultInjectionStrategy = DefaultInjectionStrategy.OPTIONAL)
+@Model(adaptables = SlingHttpServletRequest.class,
+        resourceType = MainPageModel.RESOURCE_TYPE,
+        defaultInjectionStrategy = DefaultInjectionStrategy.OPTIONAL)
 public class MainPageModel {
     static final String RESOURCE_TYPE = "aemtraining/components/content/mainpage";
+    private static final String ROOT_PATH = "/content/aemtraining/language-masters/en/newscard-nodes";
 
     @Inject
-    NewsCardModel newsCardModel;
+    private Resource resource;
 
     @SlingObject
     private ResourceResolver resourceResolver;
@@ -38,7 +41,7 @@ public class MainPageModel {
             return;
         }
         models = new ArrayList<>();
-        Page page = pageManager.getPage("/content/aemtraining/language-masters/en/newscard-nodes");
+        Page page = pageManager.getPage(ROOT_PATH);
         Iterator<Page> pageIterator = page.listChildren();
         while (pageIterator.hasNext()) {
             Page currentPage = pageIterator.next();
@@ -48,7 +51,7 @@ public class MainPageModel {
     }
 
     public String getPath() {
-        return newsCardModel.getPath();
+        return resource.getPath();
     }
 
 }

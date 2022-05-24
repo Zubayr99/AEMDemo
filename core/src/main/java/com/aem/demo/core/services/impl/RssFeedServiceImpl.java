@@ -33,8 +33,8 @@ import static com.day.cq.commons.jcr.JcrConstants.JCR_CONTENT;
 @Component(service = RssFeedService.class, immediate = true)
 public class RssFeedServiceImpl implements RssFeedService {
 
-    private final String RESOURCE_TYPE = "aemtraining/components/content/newscard";
-    private final String HOMEPAGE_TEMPLATE = "/apps/aemtraining/templates/page-home";
+    private final String RESOURCE_TYPE = "aemtraining/components/structure/singlepage";
+    private final String GRIDPAGE_TEMPLATE = "/apps/aemtraining/templates/page-home";
     private final String SITE_ROOT = "/content/aemtraining/language-masters/en";
     private final String RSSFEED_LINK = "https://www.nasa.gov/rss/dyn/educationnews.rss";
 
@@ -67,7 +67,7 @@ public class RssFeedServiceImpl implements RssFeedService {
             if (rootPage == null) {
                 rootPage = createPage(rootPath, pageManager);
             }
-                newsPage = createChildPages(cardList, resolver, rootPage);
+            newsPage = saveChildPages(cardList, resolver, rootPage);
 
         } catch (LoginException e) {
             log.error("\n Error while saving data: " + e.getMessage());
@@ -83,9 +83,9 @@ public class RssFeedServiceImpl implements RssFeedService {
             String pageName = "newscard-nodes";
             String pageTitle = "NewsCard Page Nodes";
             if (page == null) {
-                page = pageManager.create(SITE_ROOT, pageName, HOMEPAGE_TEMPLATE, pageTitle);
+                page = pageManager.create(SITE_ROOT, pageName, GRIDPAGE_TEMPLATE, pageTitle);
                 Node pageNode = page.getContentResource().adaptTo(Node.class);
-                Objects.requireNonNull(pageNode).setProperty(SLING_RESOURCE_TYPE_PROPERTY, RESOURCE_TYPE);
+                pageNode.setProperty(SLING_RESOURCE_TYPE_PROPERTY, RESOURCE_TYPE);
             }
         } catch (WCMException | RepositoryException e) {
             log.error("\n Error while creating page: " + e.getMessage());
@@ -94,18 +94,20 @@ public class RssFeedServiceImpl implements RssFeedService {
     }
 
 
-    private Page createChildPages(List<NewsCard> newsCardList, ResourceResolver resolver, Page rootPage) {
-        int importedItemsCount = 0;
+    private Page saveChildPages(List<NewsCard> newsCardList, ResourceResolver resolver, Page rootPage) {
+        int importedItemsCount = 1;
         String rootPath = rootPage.getPath();
         Session session = resolver.adaptTo(Session.class);
         PageManager pageManager = resolver.adaptTo(PageManager.class);
-        Set<String> names = getSavedNodeNames(rootPath, Objects.requireNonNull(pageManager));
-
+        if (pageManager == null) {
+            return null;
+        }
+        Set<String> names = getSavedNodeNames(rootPath, pageManager);
         if (session == null) {
             return null;
         }
         for (NewsCard newsCard : newsCardList) {
-            if (importedItemsCount > 2) {
+            if (importedItemsCount > 3) {
                 break;
             }
             String pageName = StringUtils.substringAfterLast(newsCard.getLink(), "/");
@@ -115,7 +117,7 @@ public class RssFeedServiceImpl implements RssFeedService {
             String pageTitle = newsCard.getTopic();
             Page page;
             try {
-                page = Objects.requireNonNull(pageManager).create(rootPath, pageName, HOMEPAGE_TEMPLATE, pageTitle);
+                page = pageManager.create(rootPath, pageName, GRIDPAGE_TEMPLATE, pageTitle);
             } catch (WCMException e) {
                 continue;
             }
@@ -123,29 +125,33 @@ public class RssFeedServiceImpl implements RssFeedService {
             if (pageNode == null) {
                 continue;
             }
-            try {
-                Node jcrNode;
+            createChildPage(newsCardList, newsCard, page, pageNode, session);
+            ImageRetrieverUtil.retrieveImages(newsCard.getImage(), resolver, pageName);
+            importedItemsCount++;
+        }
+        return null;
+    }
+
+    private void createChildPage(List<NewsCard> newsCardList, NewsCard newsCard, Page page, Node pageNode, Session session) {
+        try {
+            Node jcrNode;
             if (page.hasContent()) {
                 jcrNode = page.getContentResource().adaptTo(Node.class);
             } else {
                 jcrNode = pageNode.addNode(JCR_CONTENT, CQ_PAGE_CONTENT);
             }
-                Objects.requireNonNull(jcrNode).setProperty(SLING_RESOURCE_TYPE_PROPERTY, RESOURCE_TYPE);
-                jcrNode.setProperty("topic", newsCard.getTopic());
-                jcrNode.setProperty("article", newsCard.getArticle());
-                jcrNode.setProperty("link", newsCard.getLink());
-                jcrNode.setProperty("pubDate", String.valueOf(newsCard.getPubDate()));
-                jcrNode.setProperty("image", newsCard.getImage());
-                if (newsCardList.get(newsCardList.size()-1).equals(newsCard)) {
-                    session.save();
-                }
-            } catch (RepositoryException e) {
-                e.printStackTrace();
+            Objects.requireNonNull(jcrNode).setProperty(SLING_RESOURCE_TYPE_PROPERTY, RESOURCE_TYPE);
+            jcrNode.setProperty("topic", newsCard.getTopic());
+            jcrNode.setProperty("article", newsCard.getArticle());
+            jcrNode.setProperty("link", newsCard.getLink());
+            jcrNode.setProperty("pubDate", String.valueOf(newsCard.getPubDate()));
+            jcrNode.setProperty("image", newsCard.getImage());
+            if (newsCardList.get(newsCardList.size() - 1).equals(newsCard)) {
+                session.save();
             }
-            ImageRetrieverUtil.retrieveImages(newsCard.getImage(), resolver, pageName);
-            importedItemsCount++;
+        } catch (RepositoryException e) {
+            log.error("Exception occurred while creating child page: " + e.getMessage());
         }
-        return null;
     }
 
     private Set<String> getSavedNodeNames(String rootPath, PageManager pageManager) {
@@ -153,7 +159,7 @@ public class RssFeedServiceImpl implements RssFeedService {
         Iterator<Page> pageIterator = page.listChildren();
         Set<String> names = new HashSet<>();
 
-        while (pageIterator.hasNext()){
+        while (pageIterator.hasNext()) {
             names.add(pageIterator.next().getName());
         }
         return names;
