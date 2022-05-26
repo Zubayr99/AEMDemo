@@ -9,7 +9,9 @@
         <img src="${model.logo}" class="default-logo" alt="">
     </a>
     <div class="header-right">
-        <input type="text" placeholder="Search..">
-
+        <form method="GET" class="searchFrom" action="${request.requestURI}">
+            <input style="width: 180px" type="text" name="search" placeholder="Type anything..."/>
+            <input class="searchBtn" type="submit" value="Search">
+        </form>
     </div>
 </div>

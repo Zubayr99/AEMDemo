@@ -47,6 +47,17 @@ body {
     border: none;
     font-size: 17px;
 }
+.searchBtn {
+    height: 40px;
+    margin-top: 9px;
+    margin-left: -17px;
+    margin-right: 15px;
+    width: 50px;
+}
+
+.searchFrom {
+    display: flex;
+}
 
 @media screen and (max-width: 500px) {
     .header-right {

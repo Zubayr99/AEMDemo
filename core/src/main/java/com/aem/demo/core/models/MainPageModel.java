@@ -6,6 +6,7 @@ import com.day.cq.wcm.api.PageManager;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.sling.api.SlingHttpServletRequest;
+import org.apache.sling.api.request.RequestParameter;
 import org.apache.sling.api.resource.Resource;
 import org.apache.sling.api.resource.ResourceResolver;
 import org.apache.sling.models.annotations.DefaultInjectionStrategy;
@@ -18,13 +19,12 @@ import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @Slf4j
-@Model(adaptables = SlingHttpServletRequest.class,
-        resourceType = MainPageModel.RESOURCE_TYPE,
-        defaultInjectionStrategy = DefaultInjectionStrategy.OPTIONAL)
+@Model(adaptables = SlingHttpServletRequest.class, resourceType = MainPageModel.RESOURCE_TYPE, defaultInjectionStrategy = DefaultInjectionStrategy.OPTIONAL)
 public class MainPageModel {
     static final String RESOURCE_TYPE = "aemtraining/components/content/mainpage";
     private static final String ROOT_PATH = "/content/aemtraining/language-masters/en/newscard-nodes";
@@ -45,9 +45,8 @@ public class MainPageModel {
     private List<NewsCardModel> models;
 
     @Getter
-    List<Integer> pageNumbers;
+    private List<Integer> pageNumbers;
 
-    List<NewsCardModel> holdModels;
 
     @PostConstruct
     private void init() {
@@ -56,7 +55,7 @@ public class MainPageModel {
             return;
         }
         models = new ArrayList<>();
-        holdModels = new ArrayList<>();
+        List<NewsCardModel> holdModels = new ArrayList<>();
         Page page = pageManager.getPage(ROOT_PATH);
         Iterator<Page> pageIterator = page.listChildren();
         while (pageIterator.hasNext()) {
@@ -65,24 +64,31 @@ public class MainPageModel {
             holdModels.add(jcrContent.adaptTo(NewsCardModel.class));
         }
 
-        double listSize = holdModels.size();
-        double listPart = listSize / 5;
-        double roundPart = Math.round(listPart);
+        String searchText = Optional.ofNullable(servletRequest).map(SlingHttpServletRequest::getRequestParameterMap)
+                .map(map -> map.getValue("search"))
+                .map(RequestParameter::getString)
+                .orElse(null);
 
-        if (roundPart != listPart) {
-            roundPart++;
-        }
 
-        pageNumbers = IntStream.range(1, (int) (roundPart + 1)).boxed().collect(Collectors.toList());
+        String paginationNumber = Optional.ofNullable(servletRequest).map(SlingHttpServletRequest::getRequestParameterMap)
+                .map(map -> map.getValue("page"))
+                .map(RequestParameter::getString)
+                .orElse(null);
 
-        String searchText = servletRequest.getParameter("search");
-        String paginationNumber = servletRequest.getParameter("page");
+        isNumeric(paginationNumber);
+
 
         if (searchText != null) {
             models = searchService.retrieveModels(searchText);
+            paginateModels(models);
+            if (paginationNumber != null) {
+                models = separateModels(models, Integer.parseInt(paginationNumber));
+            }
         } else if (paginationNumber != null) {
+            paginateModels(holdModels);
             models = separateModels(holdModels, Integer.parseInt(paginationNumber));
         } else {
+            paginateModels(holdModels);
             models = holdModels.subList(0, 5);
         }
     }
@@ -98,6 +104,29 @@ public class MainPageModel {
             separatedPart.add(list.get(i));
         }
         return separatedPart;
+    }
+
+    private void paginateModels(List<NewsCardModel> models) {
+        double listSize = models.size();
+        double listPart = listSize / 5;
+        double roundPart = Math.ceil(listPart);
+
+        pageNumbers = IntStream.range(1, (int) (roundPart + 1)).boxed().collect(Collectors.toList());
+
+    }
+
+    private void isNumeric(String string) {
+        int intValue;
+
+        if (string == null || string.equals("")) {
+            log.info("String cannot be parsed, it is null or empty.");
+        }
+
+        try {
+            intValue = Integer.parseInt(string);
+        } catch (NumberFormatException e) {
+            log.error("Input String cannot be parsed to Integer.");
+        }
     }
 
 }

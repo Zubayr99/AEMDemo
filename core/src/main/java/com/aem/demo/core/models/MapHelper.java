@@ -38,7 +38,7 @@ public class MapHelper {
                 continue;
             }
 
-            if (entry.getValue().length > 1) {
+            if (entry.getValue().length > 0) {
                 RequestParameter requestParameter = entry.getValue()[0];
                 map.put(entry.getKey(), requestParameter.getString());
             }
