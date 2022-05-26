@@ -2,5 +2,5 @@
 <jcr:root xmlns:cq="http://www.day.com/jcr/cq/1.0" xmlns:jcr="http://www.jcp.org/jcr/1.0"
     jcr:description="Display all news cards."
     jcr:primaryType="cq:Component"
-    jcr:title="Main Page"
+    jcr:title="Grid Page"
     componentGroup="AEM DEMO - Content"/>

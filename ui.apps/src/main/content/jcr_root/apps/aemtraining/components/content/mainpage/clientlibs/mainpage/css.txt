@@ -1,2 +1,3 @@
 #base=css
 mainpage-bootstrap.css
+pagination-bootstrap.css

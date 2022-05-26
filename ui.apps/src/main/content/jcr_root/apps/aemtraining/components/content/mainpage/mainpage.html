@@ -4,7 +4,7 @@
 <sly data-sly-use.mainpage="com.aem.demo.core.models.MainPageModel"></sly>
 
 <div data-sly-list.model="${mainpage.models}" class="content-wrapper">
-    <div  class="news-card">
+    <div class="news-card">
         <a href="#" class="news-card__card-link"></a>
         <img src="${model.image}" alt="" class="news-card__image">
         <div class="news-card__text-wrapper">
@@ -12,8 +12,20 @@
             <div class="news-card__post-date">${model.pubDate}</div>
             <div class="news-card__details-wrapper">
                 <p class="news-card__excerpt">${model.article}</p>
-                <a href="${model.path @ extension = 'html'}" class="news-card__read-more">Read more <i class="fas fa-long-arrow-alt-right"></i></a>
+                <a href="${model.path @ extension = 'html'}" class="news-card__read-more">
+                    Read more
+                    <i class="fas fa-long-arrow-alt-right"></i>
+                </a>
             </div>
         </div>
     </div>
+</div>
+
+
+<div id="wrapper">
+    <ul data-sly-list.item="${mainpage.pageNumbers}" id="pagination">
+        <li>
+            <a data-sly-use.mapHelper="${'com.aem.demo.core.models.MapHelper' @ currentPage = item  }" href="${request.requestURI @ addQuery=mapHelper.queryParams}">${item}</a>
+        </li>
+    </ul>
 </div>

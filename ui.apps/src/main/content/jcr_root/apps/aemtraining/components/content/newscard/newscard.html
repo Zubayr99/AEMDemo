@@ -8,6 +8,19 @@
     <div class="wrapper">
         <div class="box">
             <img src="${newscard.image}" alt="">
+            <div class="like_dislike" style="width:400px">
+                <form action="${request.requestURI}" class="form_dislike" style="float: left; width: 130px">
+                    <button class="dislike" type="submit" name="dislike" id="dislikeId" value="false">
+                        ${newscard.disLikes}
+                    </button>
+                </form>
+
+                <form action="${request.requestURI}" class="form_like" style="float: right; width: 225px">
+                    <button class="like" type="submit" value="true">
+                        ${newscard.likes}
+                    </button>
+                </form>
+            </div>
         </div>
         <div class="box text">
             <h5>${newscard.pubDate}</h5>

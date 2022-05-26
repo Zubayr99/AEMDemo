@@ -1,13 +1,18 @@
 package com.aem.demo.core.models;
 
 import lombok.Getter;
-import org.apache.sling.api.resource.Resource;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.sling.api.SlingHttpServletRequest;
+import org.apache.sling.api.resource.*;
 import org.apache.sling.models.annotations.Default;
 import org.apache.sling.models.annotations.DefaultInjectionStrategy;
 import org.apache.sling.models.annotations.Model;
 import org.apache.sling.models.annotations.injectorspecific.SlingObject;
 import org.apache.sling.models.annotations.injectorspecific.ValueMapValue;
 
+import javax.inject.Inject;
+
+@Slf4j
 @Model(adaptables = Resource.class,
         resourceType = NewsCardModel.RESOURCE_TYPE,
         defaultInjectionStrategy = DefaultInjectionStrategy.OPTIONAL)
@@ -39,7 +44,62 @@ public class NewsCardModel {
     @Default(values = DEFAULT_IMAGE)
     private String image;
 
+//    private int likes;
+
+    @Inject
+    private SlingHttpServletRequest servletRequest;
+
+    @SlingObject
+    private ResourceResolver resourceResolver;
+
+
     public String getPath() {
-        return resource.getPath().replace("/jcr:content","");
+        return resource.getPath().replace("/jcr:content", "");
+    }
+
+    public String getFullPath() {
+        return resource.getPath();
+    }
+
+
+    public int  getLikes() {
+        int likes = 0;
+
+        String rootPath = resource.getPath();
+
+        resource = resourceResolver.getResource(rootPath);
+        ModifiableValueMap properties = resource != null ? resource.adaptTo(ModifiableValueMap.class) : null;
+
+        if (properties != null) {
+            likes = resource.adaptTo(ValueMap.class).get("likes", 0);
+            properties.put("likes", likes + 1);
+        }
+        try {
+            resourceResolver.commit();
+        } catch (PersistenceException e) {
+            log.info(e.getMessage());
+        }
+        return likes;
+    }
+
+    public int  getDisLikes() {
+        String dislikeParameter = servletRequest.getParameter("dislikeId");
+        int dislikes = 0;
+
+        String rootPath = resource.getPath();
+
+        resource = resourceResolver.getResource(rootPath);
+        ModifiableValueMap properties = resource != null ? resource.adaptTo(ModifiableValueMap.class) : null;
+
+        if (properties != null && dislikeParameter.equals("false")) {
+            dislikes = resource.adaptTo(ValueMap.class).get("dislikes", 0);
+            properties.put("dislikes", dislikes + 1);
+        }
+        try {
+            resourceResolver.commit();
+        } catch (PersistenceException e) {
+            log.info(e.getMessage());
+        }
+        return dislikes;
     }
 }
