@@ -158,7 +158,6 @@ public class RssFeedServiceImpl implements RssFeedService {
         Page page = pageManager.getPage(rootPath);
         Iterator<Page> pageIterator = page.listChildren();
         Set<String> names = new HashSet<>();
-
         while (pageIterator.hasNext()) {
             names.add(pageIterator.next().getName());
         }
