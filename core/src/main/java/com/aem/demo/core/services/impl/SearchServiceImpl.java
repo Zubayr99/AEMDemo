@@ -24,23 +24,13 @@ import static com.adobe.aemds.guide.utils.JcrResourceConstants.CQ_PAGE;
 @Slf4j
 @Component(service = SearchService.class, immediate = true)
 public class SearchServiceImpl implements SearchService {
-
     private static final String ROOT_PATH = "/content/aemtraining/language-masters";
-
 
     @Reference
     private QueryBuilder queryBuilder;
 
     @Reference
     private ResourceResolverFactory resourceResolverFactory;
-
-    private Map<String, String> createTextSearchQuery(String searchText) {
-        Map<String, String> queryMap = new HashMap<>();
-        queryMap.put("path", ROOT_PATH);
-        queryMap.put("type", CQ_PAGE);
-        queryMap.put("fulltext", searchText);
-        return queryMap;
-    }
 
     @Override
     public List<NewsCardModel> retrieveModels(String searchText) {
@@ -58,5 +48,13 @@ public class SearchServiceImpl implements SearchService {
             log.error("Exception occurred while retrieving pages " + e.getMessage());
         }
         return models;
+    }
+
+    private Map<String, String> createTextSearchQuery(String searchText) {
+        Map<String, String> queryMap = new HashMap<>();
+        queryMap.put("path", ROOT_PATH);
+        queryMap.put("type", CQ_PAGE);
+        queryMap.put("fulltext", searchText);
+        return queryMap;
     }
 }
