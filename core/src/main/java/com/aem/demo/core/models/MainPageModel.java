@@ -21,7 +21,9 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @Slf4j
-@Model(adaptables = SlingHttpServletRequest.class, resourceType = MainPageModel.RESOURCE_TYPE, defaultInjectionStrategy = DefaultInjectionStrategy.OPTIONAL)
+@Model(adaptables = SlingHttpServletRequest.class,
+        resourceType = MainPageModel.RESOURCE_TYPE,
+        defaultInjectionStrategy = DefaultInjectionStrategy.OPTIONAL)
 public class MainPageModel {
     static final String RESOURCE_TYPE = "aemtraining/components/content/mainpage";
     private static final String ROOT_PATH = "/content/aemtraining/language-masters/en/newscard-nodes";
@@ -48,10 +50,17 @@ public class MainPageModel {
 
     @PostConstruct
     private void init() {
-        String searchText = Optional.ofNullable(servletRequest).map(SlingHttpServletRequest::getRequestParameterMap).map(map -> map.getValue("search")).map(RequestParameter::getString).orElse(null);
-        String paginationNumber = Optional.ofNullable(servletRequest).map(SlingHttpServletRequest::getRequestParameterMap).map(map -> map.getValue("page")).map(RequestParameter::getString).orElse(null);
+        String searchText = Optional.ofNullable(servletRequest)
+                .map(SlingHttpServletRequest::getRequestParameterMap)
+                .map(map -> map.getValue("search"))
+                .map(RequestParameter::getString).orElse(null);
+        String paginationNumber = Optional.ofNullable(servletRequest)
+                .map(SlingHttpServletRequest::getRequestParameterMap)
+                .map(map -> map.getValue("page"))
+                .map(RequestParameter::getString).orElse(null);
         models = searchText != null ? searchService.retrieveModels(searchText) : getAllModels();
-        paginateNumbers(models);
+        producePageNumbers(models);
+        models.sort((o1, o2) -> o2.getPubDate().compareTo(o1.getPubDate()));
         models = separateModels(models, paginationNumber);
     }
 
@@ -79,19 +88,15 @@ public class MainPageModel {
         } catch (NumberFormatException e) {
             log.error("Exception occurred while parsing request parameter " + e.getMessage());
         }
-        pNumber = (pNumber - 1) * CARDS_PERPAGE;
-        int limit = Math.min(pNumber + CARDS_PERPAGE, list.size());
-        return list.subList(pNumber, limit);
+        int start = (pNumber - 1) * CARDS_PERPAGE;
+        int limit = Math.min(start + CARDS_PERPAGE, list.size());
+        return list.subList(start, limit);
     }
 
-    private void paginateNumbers(List<NewsCardModel> models) {
-        if (models.size() > 4) {
-            double listSize = models.size();
-            double listPart = listSize / CARDS_PERPAGE;
-            double roundPart = Math.ceil(listPart);
-            pageNumbers = IntStream.rangeClosed(1, (int) (roundPart)).boxed().collect(Collectors.toList());
-        } else {
-            pageNumbers = Collections.singletonList(1);
-        }
+    private void producePageNumbers(List<NewsCardModel> models) {
+        double listSize = models.size();
+        double listPart = listSize / CARDS_PERPAGE;
+        double roundPart = Math.ceil(listPart);
+        pageNumbers = IntStream.rangeClosed(1, (int) roundPart).boxed().collect(Collectors.toList());
     }
 }

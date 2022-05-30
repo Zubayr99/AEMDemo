@@ -13,7 +13,9 @@ import com.rometools.rome.io.SyndFeedInput;
 import com.rometools.rome.io.XmlReader;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.sling.api.resource.*;
+import org.apache.sling.api.resource.LoginException;
+import org.apache.sling.api.resource.ResourceResolver;
+import org.apache.sling.api.resource.ResourceResolverFactory;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -22,6 +24,7 @@ import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 import java.io.IOException;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -140,11 +143,13 @@ public class RssFeedServiceImpl implements RssFeedService {
             } else {
                 jcrNode = pageNode.addNode(JCR_CONTENT, CQ_PAGE_CONTENT);
             }
+            SimpleDateFormat dateFormat = new SimpleDateFormat("MM-dd-yyyy");
+            String formattedDate = dateFormat.format(newsCard.getPubDate());
             Objects.requireNonNull(jcrNode).setProperty(SLING_RESOURCE_TYPE_PROPERTY, RESOURCE_TYPE);
             jcrNode.setProperty("topic", newsCard.getTopic());
             jcrNode.setProperty("article", newsCard.getArticle());
             jcrNode.setProperty("link", newsCard.getLink());
-            jcrNode.setProperty("pubDate", String.valueOf(newsCard.getPubDate()));
+            jcrNode.setProperty("pubDate", formattedDate);
             jcrNode.setProperty("image", newsCard.getImage());
             if (newsCardList.get(newsCardList.size() - 1).equals(newsCard)) {
                 session.save();
