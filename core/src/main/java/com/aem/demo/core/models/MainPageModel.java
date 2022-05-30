@@ -16,10 +16,7 @@ import org.apache.sling.models.annotations.injectorspecific.SlingObject;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -28,6 +25,7 @@ import java.util.stream.IntStream;
 public class MainPageModel {
     static final String RESOURCE_TYPE = "aemtraining/components/content/mainpage";
     private static final String ROOT_PATH = "/content/aemtraining/language-masters/en/newscard-nodes";
+    private static final int CARDS_PERPAGE = 5;
 
     @Inject
     private SlingHttpServletRequest servletRequest;
@@ -50,83 +48,50 @@ public class MainPageModel {
 
     @PostConstruct
     private void init() {
+        String searchText = Optional.ofNullable(servletRequest).map(SlingHttpServletRequest::getRequestParameterMap).map(map -> map.getValue("search")).map(RequestParameter::getString).orElse(null);
+        String paginationNumber = Optional.ofNullable(servletRequest).map(SlingHttpServletRequest::getRequestParameterMap).map(map -> map.getValue("page")).map(RequestParameter::getString).orElse(null);
+        models = searchText != null ? searchService.retrieveModels(searchText) : getAllModels();
+        paginateNumbers(models);
+        models = separateModels(models, paginationNumber);
+    }
+
+    private List<NewsCardModel> getAllModels() {
+        List<NewsCardModel> modelsList = new ArrayList<>();
         PageManager pageManager = resourceResolver.adaptTo(PageManager.class);
-        if (pageManager == null) {
-            return;
-        }
-        models = new ArrayList<>();
-        List<NewsCardModel> holdModels = new ArrayList<>();
         Page page = pageManager.getPage(ROOT_PATH);
         Iterator<Page> pageIterator = page.listChildren();
         while (pageIterator.hasNext()) {
             Page currentPage = pageIterator.next();
             Resource jcrContent = currentPage.getContentResource();
-            holdModels.add(jcrContent.adaptTo(NewsCardModel.class));
+            modelsList.add(jcrContent.adaptTo(NewsCardModel.class));
         }
-
-        String searchText = Optional.ofNullable(servletRequest).map(SlingHttpServletRequest::getRequestParameterMap)
-                .map(map -> map.getValue("search"))
-                .map(RequestParameter::getString)
-                .orElse(null);
-
-
-        String paginationNumber = Optional.ofNullable(servletRequest).map(SlingHttpServletRequest::getRequestParameterMap)
-                .map(map -> map.getValue("page"))
-                .map(RequestParameter::getString)
-                .orElse(null);
-
-        isNumeric(paginationNumber);
-
-
-        if (searchText != null) {
-            models = searchService.retrieveModels(searchText);
-            paginateModels(models);
-            if (paginationNumber != null) {
-                models = separateModels(models, Integer.parseInt(paginationNumber));
-            }
-        } else if (paginationNumber != null) {
-            paginateModels(holdModels);
-            models = separateModels(holdModels, Integer.parseInt(paginationNumber));
-        } else {
-            paginateModels(holdModels);
-            models = holdModels.subList(0, 5);
-        }
+        return modelsList;
     }
 
     public String getPath() {
         return resource.getPath();
     }
 
-    private List<NewsCardModel> separateModels(List<NewsCardModel> list, int paginationNumber) {
-        int limit = Math.min(paginationNumber * 5, list.size());
-        List<NewsCardModel> separatedPart = new ArrayList<>();
-        for (int i = (paginationNumber - 1) * 5; i < limit; i++) {
-            separatedPart.add(list.get(i));
-        }
-        return separatedPart;
-    }
-
-    private void paginateModels(List<NewsCardModel> models) {
-        double listSize = models.size();
-        double listPart = listSize / 5;
-        double roundPart = Math.ceil(listPart);
-
-        pageNumbers = IntStream.range(1, (int) (roundPart + 1)).boxed().collect(Collectors.toList());
-
-    }
-
-    private void isNumeric(String string) {
-        int intValue;
-
-        if (string == null || string.equals("")) {
-            log.info("String cannot be parsed, it is null or empty.");
-        }
-
+    private List<NewsCardModel> separateModels(List<NewsCardModel> list, String paginationNumber) {
+        int pNumber = 1;
         try {
-            intValue = Integer.parseInt(string);
+            pNumber = Integer.parseInt(paginationNumber);
         } catch (NumberFormatException e) {
-            log.error("Input String cannot be parsed to Integer.");
+            log.error("Exception occurred while parsing request parameter " + e.getMessage());
         }
+        pNumber = (pNumber - 1) * CARDS_PERPAGE;
+        int limit = Math.min(pNumber + CARDS_PERPAGE, list.size());
+        return list.subList(pNumber, limit);
     }
 
+    private void paginateNumbers(List<NewsCardModel> models) {
+        if (models.size() > 4) {
+            double listSize = models.size();
+            double listPart = listSize / CARDS_PERPAGE;
+            double roundPart = Math.ceil(listPart);
+            pageNumbers = IntStream.rangeClosed(1, (int) (roundPart)).boxed().collect(Collectors.toList());
+        } else {
+            pageNumbers = Collections.singletonList(1);
+        }
+    }
 }

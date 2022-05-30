@@ -29,17 +29,16 @@ public class SearchServiceImpl implements SearchService {
 
 
     @Reference
-    QueryBuilder queryBuilder;
+    private QueryBuilder queryBuilder;
 
     @Reference
-    ResourceResolverFactory resourceResolverFactory;
+    private ResourceResolverFactory resourceResolverFactory;
 
-    public Map<String, String> createTextSearchQuery(String searchText) {
+    private Map<String, String> createTextSearchQuery(String searchText) {
         Map<String, String> queryMap = new HashMap<>();
         queryMap.put("path", ROOT_PATH);
         queryMap.put("type", CQ_PAGE);
         queryMap.put("fulltext", searchText);
-
         return queryMap;
     }
 
@@ -49,19 +48,14 @@ public class SearchServiceImpl implements SearchService {
         try (ResourceResolver resourceResolver = ResolverUtil.newResolver(resourceResolverFactory)) {
             final Session session = resourceResolver.adaptTo(Session.class);
             Query query = queryBuilder.createQuery(PredicateGroup.create(createTextSearchQuery(searchText)), session);
-
-
             SearchResult result = query.getResult();
-
             for (Iterator<Resource> it = result.getResources(); it.hasNext(); ) {
                 Resource res = it.next();
                 NewsCardModel model = res.adaptTo(Page.class).getContentResource().adaptTo(NewsCardModel.class);
                 models.add(model);
             }
-
-
         } catch (LoginException e) {
-            log.info(e.getMessage());
+            log.error("Exception occurred while retrieving pages " + e.getMessage());
         }
         return models;
     }
