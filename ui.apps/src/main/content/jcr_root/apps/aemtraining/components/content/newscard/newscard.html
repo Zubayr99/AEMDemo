@@ -10,13 +10,13 @@
             <img src="${newscard.image}" alt="">
             <div class="like_dislike" style="width:400px">
                 <form action="${request.requestURI}" class="form_dislike" style="float: left; width: 130px">
-                    <button class="dislike" type="submit" name="dislike" id="dislikeId" value="false">
-                        ${newscard.disLikes}
+                    <button class="dislike" type="submit" name="dislike" value="false">
+                        ${newscard.dislikes}
                     </button>
                 </form>
 
                 <form action="${request.requestURI}" class="form_like" style="float: right; width: 225px">
-                    <button class="like" type="submit" value="true">
+                    <button class="like" type="submit" name="like" value="true">
                         ${newscard.likes}
                     </button>
                 </form>

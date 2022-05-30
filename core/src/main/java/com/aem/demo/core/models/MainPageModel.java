@@ -13,6 +13,7 @@ import org.apache.sling.models.annotations.DefaultInjectionStrategy;
 import org.apache.sling.models.annotations.Model;
 import org.apache.sling.models.annotations.injectorspecific.OSGiService;
 import org.apache.sling.models.annotations.injectorspecific.SlingObject;
+import org.apache.sling.models.factory.ModelFactory;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
@@ -47,6 +48,8 @@ public class MainPageModel {
     @Getter
     private List<Integer> pageNumbers;
 
+    @OSGiService
+    private ModelFactory modelFactory;
 
     @PostConstruct
     private void init() {
@@ -72,7 +75,8 @@ public class MainPageModel {
         while (pageIterator.hasNext()) {
             Page currentPage = pageIterator.next();
             Resource jcrContent = currentPage.getContentResource();
-            modelsList.add(jcrContent.adaptTo(NewsCardModel.class));
+            NewsCardModel cardModel = modelFactory.getModelFromWrappedRequest(servletRequest, jcrContent, NewsCardModel.class);
+            modelsList.add(cardModel);
         }
         return modelsList;
     }
