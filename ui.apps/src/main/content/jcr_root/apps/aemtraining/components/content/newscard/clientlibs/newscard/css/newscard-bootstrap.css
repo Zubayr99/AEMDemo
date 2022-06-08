@@ -13,8 +13,6 @@ body {
     margin-top: 100px;
     background-color: #f7f7f7;
     border-radius: 15px;
-
-
 }
 
 a {
@@ -63,10 +61,7 @@ a:hover {
 .wrapper {
     display: flex;
     box-sizing: border-box;
-
     padding: 5px;
-
-
 }
 
 .box {
@@ -80,7 +75,23 @@ a:hover {
 
 .text {
     padding: 15px;
+}
 
+.like {
+    height: 25px;
+    width: 33px;
+    margin-right: -70px;
+}
+
+.dislike {
+    height: 25px;
+    width: 33px;
+}
+
+.like_dislike {
+    margin-top: 10px;
+    justify-content: center;
+    text-align: center;
 }
 
 img {

@@ -9,17 +9,14 @@
         <div class="box">
             <img src="${newscard.image}" alt="">
             <div class="like_dislike" style="width:400px">
-                <form action="${request.requestURI}" class="form_dislike" style="float: left; width: 130px">
-                    <button class="dislike" type="submit" name="false" value="dislike">
-                        ${newscard.dislikes}
-                    </button>
-                </form>
-
-                <form action="${request.requestURI}" class="form_like" style="float: right; width: 225px">
-                    <button class="like" type="submit" name="true" value="like">
-                        ${newscard.likes}
-                    </button>
-                </form>
+                <button id="dislike" class="dislike" type="button"
+                        onclick="operation(false)">
+                    ${newscard.dislikes}
+                </button>
+                <button id="like" class="like" type="button"
+                        onclick="operation(true)">
+                    ${newscard.likes}
+                </button>
             </div>
         </div>
         <div class="box text">
@@ -29,3 +26,15 @@
         </div>
     </div>
 </div>
+
+
+<script>
+    const path = '${newscard.fullPath @ context='scriptString'}';
+    function operation(tf) {
+        $.post('/services/reaction', {reaction: tf, path}, function (data) {
+            console.log(data)
+            $("#dislike").html(data.dislike);
+            $("#like").html(data.like);
+        })
+    }
+</script>
