@@ -9,19 +9,6 @@
         <root
             jcr:primaryType="nt:unstructured"
             sling:resourceType="wcm/foundation/components/responsivegrid">
-            <languagenavigation
-                jcr:primaryType="nt:unstructured"
-                sling:resourceType="aemtraining/components/content/languagenavigation"
-                navigationRoot="/content/aemtraining/"
-                structureDepth="1"/>
-            <search
-                jcr:primaryType="nt:unstructured"
-                sling:resourceType="aemtraining/components/content/search"
-                searchRoot="/content/aemtraining/"/>
-            <navigation
-                jcr:primaryType="nt:unstructured"
-                sling:resourceType="aemtraining/components/content/navigation"
-                navigationRoot="/content/aemtraining/"/>
             <breadcrumb
                 jcr:primaryType="nt:unstructured"
                 sling:resourceType="aemtraining/components/content/breadcrumb"/>
@@ -31,6 +18,21 @@
                 editable="{Boolean}true">
                 <cq:responsive jcr:primaryType="nt:unstructured"/>
             </responsivegrid>
+            <container
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="aemtraining/components/container"
+                layout="responsiveGrid">
+                <container
+                    jcr:primaryType="nt:unstructured"
+                    sling:resourceType="aemtraining/components/container"
+                    editable="{Boolean}true"/>
+                <cq:responsive jcr:primaryType="nt:unstructured">
+                    <default
+                        jcr:primaryType="nt:unstructured"
+                        offset="1"
+                        width="11"/>
+                </cq:responsive>
+            </container>
         </root>
         <cq:responsive jcr:primaryType="nt:unstructured">
             <breakpoints jcr:primaryType="nt:unstructured">

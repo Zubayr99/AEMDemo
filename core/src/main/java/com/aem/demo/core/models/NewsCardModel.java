@@ -3,10 +3,7 @@ package com.aem.demo.core.models;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.sling.api.SlingHttpServletRequest;
-import org.apache.sling.api.resource.ModifiableValueMap;
-import org.apache.sling.api.resource.PersistenceException;
-import org.apache.sling.api.resource.Resource;
-import org.apache.sling.api.resource.ResourceResolver;
+import org.apache.sling.api.resource.*;
 import org.apache.sling.models.annotations.Default;
 import org.apache.sling.models.annotations.DefaultInjectionStrategy;
 import org.apache.sling.models.annotations.Model;
@@ -48,9 +45,9 @@ public class NewsCardModel {
     @Default(values = DEFAULT_IMAGE)
     private String image;
 
-    private int likes;
+    private Integer likes = 0;
 
-    private int dislikes;
+    private Integer dislikes = 0;
 
     @Self
     private SlingHttpServletRequest servletRequest;
@@ -58,39 +55,29 @@ public class NewsCardModel {
     @SlingObject
     private ResourceResolver resourceResolver;
 
-
     public String getPath() {
         return resource.getPath().replace("/jcr:content", "");
     }
 
-    public String getFullPath() {
-        return resource.getPath();
-    }
-
-
-
     @PostConstruct
     private void init() {
-        String rootPath = resource.getPath();
-        String dislikeParam = servletRequest.getParameter("dislike");
-        String likeParam = servletRequest.getParameter("like");
+        String dislikeParam = servletRequest.getParameter("false");
+        String likeParam = servletRequest.getParameter("true");
         if (likeParam != null) {
-            likes = incrementLikeDislike(likeParam, rootPath);
+            likes = incrementLikeDislike(likeParam);
         } else if (dislikeParam != null) {
-            dislikes = incrementLikeDislike(dislikeParam, rootPath);
+            dislikes = incrementLikeDislike(dislikeParam);
         }
-
+        ValueMap valueMap = resource.adaptTo(ValueMap.class);
+        likes = valueMap.get("like", Integer.class);
+        dislikes = valueMap.get("dislike", Integer.class);
     }
 
-
-    private int incrementLikeDislike(String property, String rootPath) {
-        int incrementProperty = 0;
-        resource = resourceResolver.getResource(rootPath);
-        ModifiableValueMap properties = resource != null ? resource.adaptTo(ModifiableValueMap.class) : null;
-        if (properties != null) {
-            incrementProperty = properties.get(property, 0);
-            properties.put(property, incrementProperty + 1);
-        }
+    private int incrementLikeDislike(String property) {
+        int incrementProperty;
+        ModifiableValueMap properties = resource.adaptTo(ModifiableValueMap.class);
+        incrementProperty = properties.get(property, 0);
+        properties.put(property, incrementProperty + 1);
         try {
             resourceResolver.commit();
         } catch (PersistenceException e) {
