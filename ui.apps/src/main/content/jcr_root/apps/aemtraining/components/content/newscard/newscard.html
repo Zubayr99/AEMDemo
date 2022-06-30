@@ -1,13 +1,40 @@
-<div data-sly-use.newscard="com.aem.demo.core.models.NewsCardModel"></div>
+<sly data-sly-use.clientlib="/libs/granite/sightly/templates/clientlib.html">
+    <sly data-sly-call="${clientlib.all @ categories='aemtraining.components.newscard'}"/>
+</sly>
+<sly data-sly-use.newscard="com.aem.demo.core.models.NewsCardModel"></sly>
 
-    <div>Topic :  ${newscard.topic @ context='html'}</div>
-    <div>Article :  ${newscard.article @ context='html'}</div>
-    <div>Link:  ${newscard.link}</div>
-    <div>Published Date :  ${newscard.pubDate @ context='html'}</div>
-    <div>Image Enclosures :  ${newscard.image @ context='html'}</div>
+<div class="container">
+    <div class="text_h1"><h1>${newscard.topic}</h1></div>
+    <div class="wrapper">
+        <div class="box">
+            <img src="${newscard.image}" alt="">
+            <div class="like_dislike" style="width:400px">
+                <button id="dislike" class="dislike" type="button"
+                        onclick="operation(false)">
+                    ${newscard.dislikes}
+                </button>
+                <button id="like" class="like" type="button"
+                        onclick="operation(true)">
+                    ${newscard.likes}
+                </button>
+            </div>
+        </div>
+        <div class="box text">
+            <h5>${newscard.pubDate}</h5>
+            <h3>${newscard.article}</h3>
+            <a href="${newscard.link}" target="_blank">Read more on NASA.com</a>
+        </div>
+    </div>
+</div>
 
 
-
-
-
-
+<script>
+    const path = '${newscard.fullPath @ context='scriptString'}';
+    function operation(tf) {
+        $.post('/services/reaction', {reaction: tf, path}, function (data) {
+            console.log(data)
+            $("#dislike").html(data.dislike);
+            $("#like").html(data.like);
+        })
+    }
+</script>

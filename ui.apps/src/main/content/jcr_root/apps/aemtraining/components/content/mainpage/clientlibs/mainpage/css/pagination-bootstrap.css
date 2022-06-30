@@ -1,0 +1,22 @@
+
+#wrapper {
+    margin: 0 auto;
+    display: block;
+    width: 960px;
+    padding-bottom: 10px;
+}
+#pagination {
+    margin: 0;
+    padding: 0;
+    text-align: center
+}
+#pagination li {
+    display: inline
+}
+#pagination li button {
+    display: inline-block;
+    text-decoration: none;
+    padding: 5px 10px;
+    color: #000
+}
+

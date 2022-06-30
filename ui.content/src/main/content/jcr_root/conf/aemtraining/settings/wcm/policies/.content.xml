@@ -2,7 +2,6 @@
 <jcr:root xmlns:sling="http://sling.apache.org/jcr/sling/1.0" xmlns:cq="http://www.day.com/jcr/cq/1.0" xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:nt="http://www.jcp.org/jcr/nt/1.0" xmlns:rep="internal"
     jcr:mixinTypes="[rep:AccessControllable]"
     jcr:primaryType="cq:Page">
-    <rep:policy/>
     <wcm jcr:primaryType="nt:unstructured">
         <foundation jcr:primaryType="nt:unstructured">
             <components jcr:primaryType="nt:unstructured">
@@ -34,18 +33,8 @@
         </foundation>
     </wcm>
     <aemtraining jcr:primaryType="nt:unstructured">
-        <components jcr:primaryType="nt:unstructured">
-            <form jcr:primaryType="nt:unstructured">
-                <container jcr:primaryType="nt:unstructured">
-                    <form-container
-                        jcr:primaryType="nt:unstructured"
-                        jcr:title="AEMDemoSite Form"
-                        sling:resourceType="wcm/core/components/policy/policy"
-                        components="[/apps/aemtraining/components/form/button,/apps/aemtraining/components/form/hidden,/apps/aemtraining/components/form/options,/apps/aemtraining/components/form/text]">
-                        <jcr:content jcr:primaryType="nt:unstructured"/>
-                    </form-container>
-                </container>
-            </form>
-        </components>
+        <components jcr:primaryType="nt:unstructured"/>
+        <container jcr:primaryType="nt:unstructured"/>
     </aemtraining>
+    <rep:policy/>
 </jcr:root>
