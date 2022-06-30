@@ -20,8 +20,7 @@ import java.io.IOException;
         property = {
                 Constants.SERVICE_DESCRIPTION + "= Like and Dislike Servlet",
                 "sling.servlet.methods=" + HttpConstants.METHOD_POST,
-                "sling.servlet.paths=" + "/services/reaction",
-                "sling.servlet.extensions=" + "json"
+                "sling.servlet.paths=" + "/services/reaction"
         })
 public class LikeDislikeServlet extends SlingAllMethodsServlet {
     private static final String LIKE = "like";
@@ -31,14 +30,14 @@ public class LikeDislikeServlet extends SlingAllMethodsServlet {
     LikeDislikeService service;
 
     protected void doPost(final SlingHttpServletRequest request, final SlingHttpServletResponse response) throws IOException {
-        boolean reaction = Boolean.parseBoolean(request.getParameter("reaction"));
+        String reaction = request.getParameter("reaction");
         String path = request.getParameter("path");
         JSONObject responseData = new JSONObject();
         try {
-            if (reaction) {
+            if (reaction.equals(LIKE)) {
                 int value = service.updateLikeDislike(LIKE, path);
                 responseData.put(LIKE, value);
-            } else {
+            } else if (reaction.equals(DISLIKE)) {
                 int value = service.updateLikeDislike(DISLIKE, path);
                 responseData.put(DISLIKE, value);
             }

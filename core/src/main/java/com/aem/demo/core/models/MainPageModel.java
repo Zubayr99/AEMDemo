@@ -17,9 +17,14 @@ import org.apache.sling.models.factory.ModelFactory;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+
+import static com.adobe.cq.social.srp.internal.AbstractSchemaMapper.CQ_TAGS;
 
 @Slf4j
 @Model(adaptables = SlingHttpServletRequest.class,
@@ -48,11 +53,15 @@ public class MainPageModel {
     @Getter
     private List<Integer> pageNumbers;
 
+    @Getter
+    private String tag;
+
     @OSGiService
     private ModelFactory modelFactory;
 
     @PostConstruct
     private void init() {
+        String tagParam = servletRequest.getParameter("tag");
         String searchText = Optional.ofNullable(servletRequest)
                 .map(SlingHttpServletRequest::getRequestParameterMap)
                 .map(map -> map.getValue("search"))
@@ -61,9 +70,15 @@ public class MainPageModel {
                 .map(SlingHttpServletRequest::getRequestParameterMap)
                 .map(map -> map.getValue("page"))
                 .map(RequestParameter::getString).orElse(null);
-        models = searchText != null ? searchService.retrieveModels(searchText) : getAllModels();
+        tag = tagParam;
+        models = getAllModels();
+        if (tagParam != null && !tagParam.isEmpty()) {
+            models = retrieveModelsByTag(tagParam);
+        }
+        if (searchText != null) {
+            models = searchModels(models, searchText);
+        }
         producePageNumbers(models);
-        models.sort((o1, o2) -> o2.getPubDate().compareTo(o1.getPubDate()));
         models = separateModels(models, paginationNumber);
     }
 
@@ -102,5 +117,39 @@ public class MainPageModel {
         double listPart = listSize / CARDS_PERPAGE;
         double roundPart = Math.ceil(listPart);
         pageNumbers = IntStream.rangeClosed(1, (int) roundPart).boxed().collect(Collectors.toList());
+    }
+
+    private List<NewsCardModel> retrieveModelsByTag(String tagId) {
+        List<NewsCardModel> taggedModels = new ArrayList<>();
+        PageManager pageManager = resourceResolver.adaptTo(PageManager.class);
+        Page page = pageManager.getPage(ROOT_PATH);
+        Iterator<Page> pageIterator = page.listChildren();
+        while (pageIterator.hasNext()) {
+            Page currentPage = pageIterator.next();
+            Resource jcrContent = currentPage.getContentResource();
+            String[] tags = jcrContent.getValueMap().get(CQ_TAGS, String[].class);
+            if (tags == null) {
+                continue;
+            }
+            for (String item : tags) {
+                if (item.contains(tagId)) {
+                    NewsCardModel cardModel = modelFactory.getModelFromWrappedRequest(servletRequest, jcrContent, NewsCardModel.class);
+                    taggedModels.add(cardModel);
+                }
+            }
+        }
+        return taggedModels;
+    }
+
+    private List<NewsCardModel> searchModels(List<NewsCardModel> models, String searchParam) {
+        List<NewsCardModel> result = new ArrayList<>();
+        for (NewsCardModel model : models) {
+            String topic = model.getTopic().toLowerCase();
+            String desc = model.getArticle().toLowerCase();
+            if (topic.contains(searchParam) || desc.contains(searchParam)) {
+                result.add(model);
+            }
+        }
+        return result;
     }
 }

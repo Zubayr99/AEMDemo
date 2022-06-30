@@ -16,17 +16,15 @@ public class LikeDislikeServiceImpl implements LikeDislikeService {
 
     @Override
     public int updateLikeDislike(String property, String rootPath) {
-        int incrementProperty;
         int result = 0;
         try (ResourceResolver resolver = ResolverUtil.newResolver(resourceResolverFactory)) {
             Resource resource = resolver.getResource(rootPath);
             ModifiableValueMap properties = resource.adaptTo(ModifiableValueMap.class);
-            incrementProperty = properties.get(property, 0);
-            properties.put(property, incrementProperty + 1);
-            result = properties.get(property, 0);
+            result = properties.get(property, 0) + 1;
+            properties.put(property, result);
             resolver.commit();
         } catch (LoginException | PersistenceException e) {
-            log.error("Exception occurred updating likes and dislikes " + e.getMessage());
+            log.error("Exception occurred while updating likes and dislikes " + e.getMessage());
         }
         return result;
     }
