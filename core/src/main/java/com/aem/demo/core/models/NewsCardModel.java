@@ -3,11 +3,12 @@ package com.aem.demo.core.models;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.sling.api.SlingHttpServletRequest;
-import org.apache.sling.api.resource.*;
+import org.apache.sling.api.resource.Resource;
+import org.apache.sling.api.resource.ResourceResolver;
+import org.apache.sling.api.resource.ValueMap;
 import org.apache.sling.models.annotations.Default;
 import org.apache.sling.models.annotations.DefaultInjectionStrategy;
 import org.apache.sling.models.annotations.Model;
-import org.apache.sling.models.annotations.injectorspecific.Self;
 import org.apache.sling.models.annotations.injectorspecific.SlingObject;
 import org.apache.sling.models.annotations.injectorspecific.ValueMapValue;
 
@@ -45,12 +46,9 @@ public class NewsCardModel {
     @Default(values = DEFAULT_IMAGE)
     private String image;
 
-    private Integer likes = 0;
+    private Integer likes;
 
-    private Integer dislikes = 0;
-
-    @Self
-    private SlingHttpServletRequest servletRequest;
+    private Integer dislikes;
 
     @SlingObject
     private ResourceResolver resourceResolver;
@@ -59,31 +57,14 @@ public class NewsCardModel {
         return resource.getPath().replace("/jcr:content", "");
     }
 
+    public String getFullPath() {
+        return resource.getPath();
+    }
+
     @PostConstruct
     private void init() {
-        String dislikeParam = servletRequest.getParameter("false");
-        String likeParam = servletRequest.getParameter("true");
-        if (likeParam != null) {
-            likes = incrementLikeDislike(likeParam);
-        } else if (dislikeParam != null) {
-            dislikes = incrementLikeDislike(dislikeParam);
-        }
         ValueMap valueMap = resource.adaptTo(ValueMap.class);
         likes = valueMap.get("like", Integer.class);
         dislikes = valueMap.get("dislike", Integer.class);
     }
-
-    private int incrementLikeDislike(String property) {
-        int incrementProperty;
-        ModifiableValueMap properties = resource.adaptTo(ModifiableValueMap.class);
-        incrementProperty = properties.get(property, 0);
-        properties.put(property, incrementProperty + 1);
-        try {
-            resourceResolver.commit();
-        } catch (PersistenceException e) {
-            log.error("Exception occurred while incrementing like or dislike " + e.getMessage());
-        }
-        return incrementProperty;
-    }
-
 }
