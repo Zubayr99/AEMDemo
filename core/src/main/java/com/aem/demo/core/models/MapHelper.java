@@ -2,7 +2,6 @@ package com.aem.demo.core.models;
 
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.sling.api.SlingHttpServletRequest;
 import org.apache.sling.api.request.RequestParameter;
 import org.apache.sling.api.request.RequestParameterMap;
@@ -41,7 +40,7 @@ public class MapHelper {
             }
         }
         map.put("page", String.valueOf(currentPage));
-        if (StringUtils.isNotEmpty(tag)) {
+        if (tag != null) {
             map.put("tag", tag);
         }
         return map;

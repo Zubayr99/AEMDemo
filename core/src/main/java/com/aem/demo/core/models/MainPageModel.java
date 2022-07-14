@@ -5,7 +5,6 @@ import com.day.cq.wcm.api.Page;
 import com.day.cq.wcm.api.PageManager;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.sling.api.SlingHttpServletRequest;
 import org.apache.sling.api.request.RequestParameter;
 import org.apache.sling.api.resource.Resource;
@@ -73,8 +72,8 @@ public class MainPageModel {
                 .map(RequestParameter::getString).orElse(null);
         tag = tagParam;
         models = getAllModels();
-        if (StringUtils.isNotEmpty(tagParam)) {
-            models = retrieveModelsByTag(models, tagParam);
+        if (tagParam != null && !tagParam.isEmpty()) {
+            models = retrieveModelsByTag(tagParam);
         }
         if (searchText != null) {
             models = searchModels(models, searchText);
@@ -120,10 +119,7 @@ public class MainPageModel {
         pageNumbers = IntStream.rangeClosed(1, (int) roundPart).boxed().collect(Collectors.toList());
     }
 
-    private List<NewsCardModel> retrieveModelsByTag(List<NewsCardModel> models, String tagId) {
-        for (NewsCardModel model:models){
-            Resource jcrContent = model.getResource();
-        }
+    private List<NewsCardModel> retrieveModelsByTag(String tagId) {
         List<NewsCardModel> taggedModels = new ArrayList<>();
         PageManager pageManager = resourceResolver.adaptTo(PageManager.class);
         Page page = pageManager.getPage(ROOT_PATH);
@@ -148,9 +144,9 @@ public class MainPageModel {
     private List<NewsCardModel> searchModels(List<NewsCardModel> models, String searchParam) {
         List<NewsCardModel> result = new ArrayList<>();
         for (NewsCardModel model : models) {
-            String topic = model.getTopic();
-            String desc = model.getArticle();
-            if (StringUtils.containsIgnoreCase(topic, searchParam) || StringUtils.containsIgnoreCase(desc, searchParam)) {
+            String topic = model.getTopic().toLowerCase();
+            String desc = model.getArticle().toLowerCase();
+            if (topic.contains(searchParam) || desc.contains(searchParam)) {
                 result.add(model);
             }
         }

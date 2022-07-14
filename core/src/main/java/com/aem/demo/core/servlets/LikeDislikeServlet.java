@@ -2,7 +2,6 @@ package com.aem.demo.core.servlets;
 
 import com.aem.demo.core.services.LikeDislikeService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.sling.api.SlingHttpServletRequest;
 import org.apache.sling.api.SlingHttpServletResponse;
 import org.apache.sling.api.servlets.HttpConstants;
@@ -35,10 +34,10 @@ public class LikeDislikeServlet extends SlingAllMethodsServlet {
         String path = request.getParameter("path");
         JSONObject responseData = new JSONObject();
         try {
-            if (StringUtils.equals(reaction, LIKE)) {
+            if (reaction.equals(LIKE)) {
                 int value = service.updateLikeDislike(LIKE, path);
                 responseData.put(LIKE, value);
-            } else if (StringUtils.equals(reaction, DISLIKE)) {
+            } else if (reaction.equals(DISLIKE)) {
                 int value = service.updateLikeDislike(DISLIKE, path);
                 responseData.put(DISLIKE, value);
             }
