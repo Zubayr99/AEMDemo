@@ -23,14 +23,11 @@ public class RssFeedServlet extends SlingSafeMethodsServlet {
     @Reference
     private transient RssFeedService rssFeedService;
 
-
-
     @Override
     protected void doGet(final SlingHttpServletRequest request,
                           final SlingHttpServletResponse response) throws IOException {
         response.setContentType("text/html");
         rssFeedService.importData();
         response.getWriter().write("RSS FEED UPDATED");
-
     }
 }

@@ -24,8 +24,8 @@
 
 <div id="wrapper">
     <ul data-sly-list.item="${mainpage.pageNumbers}" id="pagination">
-        <li>
-            <a data-sly-use.mapHelper="${'com.aem.demo.core.models.MapHelper' @ currentPage = item  }" href="${request.requestURI @ addQuery=mapHelper.queryParams}">${item}</a>
+        <li >
+            <a data-sly-use.mapHelper="${'com.aem.demo.core.models.MapHelper' @ currentPage = item, tag = mainpage.tag }" href="${request.requestURI @ addQuery=mapHelper.queryParams}">${item}</a>
         </li>
     </ul>
 </div>

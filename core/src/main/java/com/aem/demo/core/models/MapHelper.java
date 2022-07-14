@@ -22,31 +22,27 @@ public class MapHelper {
     @Inject
     private int currentPage;
 
+    @Inject
+    private String tag;
 
     public Map<String, String> getQueryParams() {
         Map<String, String> map = new HashMap<>();
-
         servletRequest.getRequestParameterMap();
-
         RequestParameterMap requestParameterMap = servletRequest.getRequestParameterMap();
-
-        for (Map.Entry<String, RequestParameter[]> entry: requestParameterMap.entrySet()) {
-
+        for (Map.Entry<String, RequestParameter[]> entry : requestParameterMap.entrySet()) {
             RequestParameter[] parameters = entry.getValue();
-
             if (parameters == null) {
                 continue;
             }
-
             if (entry.getValue().length > 0) {
                 RequestParameter requestParameter = entry.getValue()[0];
                 map.put(entry.getKey(), requestParameter.getString());
             }
         }
-
         map.put("page", String.valueOf(currentPage));
-
+        if (tag != null) {
+            map.put("tag", tag);
+        }
         return map;
     }
-
 }

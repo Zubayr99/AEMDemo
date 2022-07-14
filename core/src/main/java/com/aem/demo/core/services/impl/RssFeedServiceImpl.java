@@ -4,6 +4,9 @@ import com.aem.demo.core.dto.NewsCard;
 import com.aem.demo.core.services.RssFeedService;
 import com.aem.demo.core.utils.ImageRetrieverUtil;
 import com.aem.demo.core.utils.ResolverUtil;
+import com.day.cq.tagging.InvalidTagFormatException;
+import com.day.cq.tagging.Tag;
+import com.day.cq.tagging.TagManager;
 import com.day.cq.wcm.api.Page;
 import com.day.cq.wcm.api.PageManager;
 import com.day.cq.wcm.api.WCMException;
@@ -30,6 +33,7 @@ import java.util.stream.Collectors;
 
 import static com.adobe.aemds.guide.utils.JcrResourceConstants.CQ_PAGE_CONTENT;
 import static com.adobe.aemds.guide.utils.JcrResourceConstants.SLING_RESOURCE_TYPE_PROPERTY;
+import static com.adobe.cq.social.srp.internal.AbstractSchemaMapper.CQ_TAGS;
 import static com.day.cq.commons.jcr.JcrConstants.JCR_CONTENT;
 
 @Slf4j
@@ -128,14 +132,15 @@ public class RssFeedServiceImpl implements RssFeedService {
             if (pageNode == null) {
                 continue;
             }
-            createChildPage(newsCardList, newsCard, page, pageNode, session);
+            String[] tagPaths = makeTags(resolver, newsCard);
+            createChildPage(newsCardList, newsCard, page, pageNode, session, tagPaths);
             ImageRetrieverUtil.retrieveImages(newsCard.getImage(), resolver, pageName);
             importedItemsCount++;
         }
         return null;
     }
 
-    private void createChildPage(List<NewsCard> newsCardList, NewsCard newsCard, Page page, Node pageNode, Session session) {
+    private void createChildPage(List<NewsCard> newsCardList, NewsCard newsCard, Page page, Node pageNode, Session session, String[] tagPaths) {
         try {
             Node jcrNode;
             if (page.hasContent()) {
@@ -151,6 +156,7 @@ public class RssFeedServiceImpl implements RssFeedService {
             jcrNode.setProperty("link", newsCard.getLink());
             jcrNode.setProperty("pubDate", formattedDate);
             jcrNode.setProperty("image", newsCard.getImage());
+            jcrNode.setProperty(CQ_TAGS, tagPaths);
             if (newsCardList.get(newsCardList.size() - 1).equals(newsCard)) {
                 session.save();
             }
@@ -169,4 +175,25 @@ public class RssFeedServiceImpl implements RssFeedService {
         return names;
     }
 
+    private String[] makeTags(ResourceResolver resourceResolver, NewsCard card) {
+        String[] pathArr = new String[3];
+        List<String> titles = splitTitle(card.getTopic());
+        TagManager tagManager = resourceResolver.adaptTo(TagManager.class);
+        try {
+            for (int i = 0; i < titles.size(); i++) {
+                String title = titles.get(i);
+                Tag tag = tagManager.createTag(title, title, card.getTopic(), true);
+                pathArr[i] = tag.getPath();
+            }
+        } catch (InvalidTagFormatException e) {
+            log.error("Exception occurred while creating tags " + e.getMessage());
+        }
+        return pathArr;
+    }
+
+    private List<String> splitTitle(String title) {
+        String regex = "([,\\s?.'’@]+)|(the)|(for)|(with)|(from)|(by)|(gets)";
+        List<String> stringList = List.of(title.toLowerCase().replaceAll(regex, " ").split(" "));
+        return stringList.subList(0, 3);
+    }
 }
