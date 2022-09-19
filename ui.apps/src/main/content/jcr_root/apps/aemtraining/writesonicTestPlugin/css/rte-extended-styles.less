@@ -1,0 +1,33 @@
+.richtext-container {
+    .check-item {
+        position: relative;
+        list-style: none;
+        padding-left: 20px;
+
+        &:before {
+            position: absolute;
+            left: 0;
+        }
+
+        &.checked:before {
+            content: '\2713';
+            color: green;
+            padding: 0 6px 0 0;
+        }
+        &.unchecked:before {
+            content: 'x';
+            color: red;
+            font-size: 20px;
+            font-family: cursive;
+            transform: translateY(-2px);
+        }
+    }
+
+    .strike-text {
+        text-decoration: line-through;
+    }
+
+    .red-text {
+        color: #D93A09;
+    }
+}

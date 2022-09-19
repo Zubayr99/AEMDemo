@@ -1,0 +1,2 @@
+js/rte-checklist-command.js
+js/rte-checklist-plugin.js

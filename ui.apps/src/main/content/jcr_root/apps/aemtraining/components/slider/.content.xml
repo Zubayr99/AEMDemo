@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jcr:root xmlns:sling="http://java.sun.com/JSP/Page" xmlns:jcr="http://www.jcp.org/jcr/1.0"
+          jcr:primaryType="sling:Folder"
+          jcr:title="Slider Component"
+          sling:resourceSuperType="granite/ui/components/coral/foundation/form/field"/>
