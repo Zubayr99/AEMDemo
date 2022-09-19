@@ -25,6 +25,7 @@ public class CardHeaderModel {
     private static final String DEFAULT_LOGO = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSbEcTC5pyFCmCwnGeRAsxAMr8bjIhTUZvAsgA3tsDtbPvLUxFKc-1H9xnfUmoAcVIudQ&usqp=CAU";
     private static final String GRIDPAGE_PATH = "/content/aemtraining/language-masters/en/mainpage";
 
+
     @ValueMapValue
     @Default(values = DEFAULT_LOGO)
     private String logo;
