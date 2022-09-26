@@ -46,7 +46,7 @@
             }
             
             this.pickerUI = tbGenerator.createElement(COLOR_PICKER_FEATURE, this, false, {
-                title: TITLE
+                title: "test title"
             });
             tbGenerator.addElement(GROUP, plg.Plugin.SORT_FORMAT, this.pickerUI, 10);
             
@@ -79,7 +79,7 @@
                         'command': this.pluginId + '#' + COLOR_PICKER_FEATURE
                     }
                 };
-            
+
             if (this.ColorPickerDialog) {
                 dialog = this.ColorPickerDialog;
             } else {
@@ -174,61 +174,61 @@
     
     CUI.rte.plugins.PluginRegistry.register(GROUP, ColorPickerPlugin);
     
-    var ColorPickerCmd = new Class({
-        toString: "ColorPickerCmd",
-        
-        extend: CUI.rte.commands.Command,
-        
-        isCommand: function (cmdStr) {
-            return (cmdStr.toLowerCase() == COLOR_PICKER_FEATURE);
-        },
-        
-        getProcessingOptions: function () {
-            var cmd = CUI.rte.commands.Command;
-            return cmd.PO_SELECTION | cmd.PO_BOOKMARK | cmd.PO_NODELIST;
-        },
-        
-        _getTagObject: function (color) {
-            return {
-                "tag": "span",
-                "attributes": {
-                    "style": "color: " + color
-                }
-            };
-        },
-        
-        execute: function (execDef) {
-            var color = execDef.value ? execDef.value[PICKER_NAME_IN_POPOVER] : undefined,
-                selection = execDef.selection,
-                nodeList = execDef.nodeList;
-            
-            if (!selection || !nodeList) {
-                return;
-            }
-            
-            var common = CUI.rte.Common,
-                context = execDef.editContext,
-                tagObj = this._getTagObject(color);
-            
-            //if no color value passed, assume delete and remove color
-            if (_.isEmpty(color)) {
-                nodeList.removeNodesByTag(execDef.editContext, tagObj.tag, undefined, true);
-                return;
-            }
-            
-            var tags = common.getTagInPath(context, selection.startNode, tagObj.tag);
-            
-            //remove existing color before adding new color
-            if (tags != null) {
-                nodeList.removeNodesByTag(execDef.editContext, tagObj.tag, undefined, true);
-                nodeList.commonAncestor = nodeList.nodes[0].dom.parentNode;
-            }
-            
-            nodeList.surround(execDef.editContext, tagObj.tag, tagObj.attributes);
-        }
-    });
+    // var ColorPickerCmd = new Class({
+    //     toString: "ColorPickerCmd",
+    //
+    //     extend: CUI.rte.commands.Command,
+    //
+    //     isCommand: function (cmdStr) {
+    //         return (cmdStr.toLowerCase() == COLOR_PICKER_FEATURE);
+    //     },
+    //
+    //     getProcessingOptions: function () {
+    //         var cmd = CUI.rte.commands.Command;
+    //         return cmd.PO_SELECTION | cmd.PO_BOOKMARK | cmd.PO_NODELIST;
+    //     },
+    //
+    //     _getTagObject: function (color) {
+    //         return {
+    //             "tag": "span",
+    //             "attributes": {
+    //                 "style": "color: " + color
+    //             }
+    //         };
+    //     },
+    //
+    //     execute: function (execDef) {
+    //         var color = execDef.value ? execDef.value[PICKER_NAME_IN_POPOVER] : undefined,
+    //             selection = execDef.selection,
+    //             nodeList = execDef.nodeList;
+    //
+    //         if (!selection || !nodeList) {
+    //             return;
+    //         }
+    //
+    //         var common = CUI.rte.Common,
+    //             context = execDef.editContext,
+    //             tagObj = this._getTagObject(color);
+    //
+    //         //if no color value passed, assume delete and remove color
+    //         if (_.isEmpty(color)) {
+    //             nodeList.removeNodesByTag(execDef.editContext, tagObj.tag, undefined, true);
+    //             return;
+    //         }
+    //
+    //         var tags = common.getTagInPath(context, selection.startNode, tagObj.tag);
+    //
+    //         //remove existing color before adding new color
+    //         if (tags != null) {
+    //             nodeList.removeNodesByTag(execDef.editContext, tagObj.tag, undefined, true);
+    //             nodeList.commonAncestor = nodeList.nodes[0].dom.parentNode;
+    //         }
+    //
+    //         nodeList.surround(execDef.editContext, tagObj.tag, tagObj.attributes);
+    //     }
+    // });
     
-    CUI.rte.commands.CommandRegistry.register(COLOR_PICKER_FEATURE, ColorPickerCmd);
+    // CUI.rte.commands.CommandRegistry.register(COLOR_PICKER_FEATURE, ColorPickerCmd);
     
     function addDialogTemplate() {
         var url = PICKER_URL + "?" + REQUESTER + "=" + GROUP;
@@ -257,6 +257,7 @@
         COLOR = "color",
         ADD_COLOR_BUT = "#CP_ADD_COLOR",
         REMOVE_COLOR_BUT = "#CP_REMOVE_COLOR",
+        CP_ADD_SMTH = "#CP_ADD_SMTH",
         DIALOG_CLASS = "color-Picker-Dialog";
     
     
@@ -298,6 +299,7 @@
         
         var $addColor = $dialog.find(ADD_COLOR_BUT),
             $removeColor = $dialog.find(REMOVE_COLOR_BUT),
+            $testbtn = $dialog.find(CP_ADD_SMTH),
             color = queryParameters()[COLOR],
             $colorPicker = $dialog.find("[name='./" + COLOR + "']");
         
@@ -312,10 +314,25 @@
         }
         
         adjustHeader($dialog);
-        
+
+        $dialog.createElement("input"); //input element, text  // not working
+        $dialog.setAttribute('type',"text");
+        $dialog.setAttribute('name',"username");
+        $dialog.setAttribute('value',"default");
+        new XMLSerializer().serializeToString(i);
+
         $addColor.click(sendDataMessage);
-        
+        $testbtn.click(window.alert("sdfgsdfg sdfg "))
         $removeColor.click(sendRemoveMessage);
+    }
+
+    function windowAlrt() {
+        var message = {
+            sender: SENDER,
+            action: "submit"
+        };
+
+        parent.postMessage(JSON.stringify(message), "*");
     }
     
     function adjustHeader($dialog) {
