@@ -7,67 +7,110 @@
         REQUESTER = "requester",
         TITLE = "Color Picker",
         ICON = "textColor",
+        BTN_OPT1 = "#opt1",
+        BTN_OPT2 = "#opt2",
+        BTN_OPT3 = "#opt3",
+        BTN_OPT4 = "#opt4",
+        BTN_OPT5 = "#opt5",
+        DIALOG_CLASS = "color-Picker-Dialog",
         PICKER_URL = "/apps/aemtraining/stylepicker/plugins/popovers/color-picker/_cq_dialog.html";
-    
+
     if (document.location.pathname.indexOf("/editor.html/") > -1)
         addDialogTemplate();
-    
-    
+
+
     var ColorPickerDialog = new Class({
         extend: CUI.rte.ui.cui.AbstractDialog,
-        
+
         toString: "ColorPickerDialog",
-        
+
         initialize: function (config) {
             this.exec = config.execute;
         },
-        
+
         getDataType: function () {
             return DIALOG;
         }
     });
-    
+
     var ColorPickerPlugin = new Class({
         toString: "ColorPickerPlugin",
-        
+
         extend: CUI.rte.plugins.Plugin,
-        
+
         pickerUI: null,
-        
+
         getFeatures: function () {
             return [COLOR_PICKER_FEATURE];
         },
-        
+
         initializeUI: function (tbGenerator) {
             var plg = CUI.rte.plugins;
-            
+
             if (!this.isFeatureEnabled(COLOR_PICKER_FEATURE)) {
                 return;
             }
-            
+
             this.pickerUI = tbGenerator.createElement(COLOR_PICKER_FEATURE, this, false, {
                 title: "test title"
             });
             tbGenerator.addElement(GROUP, plg.Plugin.SORT_FORMAT, this.pickerUI, 10);
-            
+
             var groupFeature = GROUP + "#" + COLOR_PICKER_FEATURE;
             tbGenerator.registerIcon(groupFeature, ICON);
         },
-        
+
         execute: function (id, value, envOptions) {
+
             if (!isValidSelection()) {
                 return;
             }
-            
+
+            const text = window.getSelection().anchorNode.data;
+
+
+            fetch("https://api.writesonic.com/v1/business/content/content-rephrase?engine=economy&language=en", {
+                "headers": {
+                    "content-type": "application/json",
+                    "accept": "application/json",
+                    "X-API-KEY": "a055b444-1abe-4c8e-afa2-59f892743f0a"
+                }, "body": JSON.stringify({"content_to_rephrase": text, "tone_of_voice": "excited"}),
+                "method": "POST",
+            }).then(res => res.json())  .then(processResult);
+
+
+            // var $dialog = $("coral-dialog.cq-Dialog");
+            // $dialog.addClass(DIALOG_CLASS);
+
+            if (_.isEmpty($dialog)) {
+                return;
+            }
+            // coral-button-label
+
+            var $btn5 = $dialog.find(BTN_OPT5);
+
+            // var atr = $dialog.context.createAttribute("button", "button")
+            //   $dialog.context.createTextNode("bla bla bla")
+
+            // $btn4.dblclick(window.alert("ta tat a"))
+
+            // const  attr = document.getElementById(BTN_OPT5);
+            // attr.textContent = "test name for btn5"
+            //
+            // document.getElementById(BTN_OPT5).setAttribute(attr);
+
+
+            // $btn5.click.label("test test");
+
             var context = envOptions.editContext,
                 selection = CUI.rte.Selection.createProcessingSelection(context),
                 ek = this.editorKernel,
                 startNode = selection.startNode;
-            
+
             if ((selection.startOffset === startNode.length) && (startNode != selection.endNode)) {
                 startNode = startNode.nextSibling;
             }
-            
+
             var tag = CUI.rte.Common.getTagInPath(context, startNode, "span"),
                 plugin = this,
                 dialog,
@@ -84,36 +127,36 @@
                 dialog = this.ColorPickerDialog;
             } else {
                 dialog = new ColorPickerDialog();
-                
+
                 dialog.attach(propConfig, $container, this.editorKernel);
-                
+
                 dialog.$dialog.css("-webkit-transform", "scale(0.9)").css("-webkit-transform-origin", "0 0")
                     .css("-moz-transform", "scale(0.9)").css("-moz-transform-origin", "0px 0px");
-                
+
                 dialog.$dialog.find("iframe").attr("src", getPickerIFrameUrl(color));
-                
+
                 this.ColorPickerDialog = dialog;
             }
-            
+
             dm.show(dialog);
-            
+
             registerReceiveDataListener(receiveMessage);
-            
+
             function isValidSelection() {
                 var winSel = window.getSelection();
                 return winSel && winSel.rangeCount == 1 && winSel.getRangeAt(0).toString().length > 0;
             }
-            
+
             function getPickerIFrameUrl(color) {
                 var url = PICKER_URL + "?" + REQUESTER + "=" + GROUP;
-                
+
                 if (!_.isEmpty(color)) {
                     url = url + "&" + PICKER_NAME_IN_POPOVER + "=" + color;
                 }
-                
+
                 return url;
             }
-            
+
             function removeReceiveDataListener(handler) {
                 if (window.removeEventListener) {
                     window.removeEventListener("message", handler);
@@ -121,7 +164,7 @@
                     window.detachEvent("onmessage", handler);
                 }
             }
-            
+
             function registerReceiveDataListener(handler) {
                 if (window.addEventListener) {
                     window.addEventListener("message", handler, false);
@@ -129,21 +172,21 @@
                     window.attachEvent("onmessage", handler);
                 }
             }
-            
+
             function receiveMessage(event) {
                 if (_.isEmpty(event.data)) {
                     return;
                 }
-                
+
                 var message = JSON.parse(event.data),
                     action;
-                
+
                 if (!message || message.sender !== GROUP) {
                     return;
                 }
-                
+
                 action = message.action;
-                
+
                 if (action === "submit") {
                     if (!_.isEmpty(message.data)) {
                         ek.relayCmd(id, message.data);
@@ -155,25 +198,31 @@
                 } else if (action === "cancel") {
                     plugin.ColorPickerDialog = null;
                 }
-                
+
                 dialog.hide();
-                
+
                 removeReceiveDataListener(receiveMessage);
             }
         },
-        
+
         //to mark the icon selected/deselected
         updateState: function (selDef) {
             var hasUC = this.editorKernel.queryState(COLOR_PICKER_FEATURE, selDef);
-            
+
             if (this.pickerUI != null) {
                 this.pickerUI.setSelected(hasUC);
             }
         }
     });
-    
+
+    function processResult(res) {
+        var $dialog = $("coral-dialog.cq-Dialog");
+        $dialog.addClass(DIALOG_CLASS);
+
+    }
+
     CUI.rte.plugins.PluginRegistry.register(GROUP, ColorPickerPlugin);
-    
+
     // var ColorPickerCmd = new Class({
     //     toString: "ColorPickerCmd",
     //
@@ -227,27 +276,26 @@
     //         nodeList.surround(execDef.editContext, tagObj.tag, tagObj.attributes);
     //     }
     // });
-    
+
     // CUI.rte.commands.CommandRegistry.register(COLOR_PICKER_FEATURE, ColorPickerCmd);
-    
+
     function addDialogTemplate() {
         var url = PICKER_URL + "?" + REQUESTER + "=" + GROUP;
-        
+
         var html = "<iframe width='500px' height='300px' frameBorder='0' src='" + url + "'></iframe>";
-        
+
         if (_.isUndefined(CUI.rte.Templates)) {
             CUI.rte.Templates = {};
         }
-        
+
         if (_.isUndefined(CUI.rte.templates)) {
             CUI.rte.templates = {};
         }
-        
+
         CUI.rte.templates['dlg-' + DIALOG] = CUI.rte.Templates['dlg-' + DIALOG] = Handlebars.compile(html);
     }
-    
-}(jQuery, window.CUI, jQuery(document)));
 
+}(jQuery, window.CUI, jQuery(document)));
 
 
 // RTE ColorPicker Plugin Popover code
@@ -257,72 +305,70 @@
         COLOR = "color",
         ADD_COLOR_BUT = "#CP_ADD_COLOR",
         REMOVE_COLOR_BUT = "#CP_REMOVE_COLOR",
-        CP_ADD_SMTH = "#CP_ADD_SMTH",
+        BTN_OPT1 = "#opt1",
+        BTN_OPT2 = "#opt2",
+        BTN_OPT3 = "#opt3",
+        BTN_OPT4 = "#opt4",
+        BTN_OPT5 = "#opt5",
         DIALOG_CLASS = "color-Picker-Dialog";
-    
-    
+
+
     if (queryParameters()[REQUESTER] !== SENDER) {
         return;
     }
-    
+
     $(function () {
         _.defer(setupPopoverIframe);
     });
-    
+
     function queryParameters() {
         var result = {},
             param,
             params = document.location.search.split(/\?|\&/);
-        
+
         params.forEach(function (it) {
             if (_.isEmpty(it)) {
                 return;
             }
-            
+
             param = it.split("=");
             result[param[0]] = param[1];
         });
-        
+
         return result;
     }
-    
+
     function setupPopoverIframe() {
         var queryParams = queryParameters(),
             $dialog = $("coral-dialog.cq-Dialog");
         $dialog.addClass(DIALOG_CLASS);
-        
+
         if (_.isEmpty($dialog)) {
             return;
         }
-        
+
         $dialog[0].open = true;
-        
+
         var $addColor = $dialog.find(ADD_COLOR_BUT),
             $removeColor = $dialog.find(REMOVE_COLOR_BUT),
-            $testbtn = $dialog.find(CP_ADD_SMTH),
+            $testbtn = $dialog.find(BTN_OPT1),
             color = queryParameters()[COLOR],
             $colorPicker = $dialog.find("[name='./" + COLOR + "']");
-        
+
         if (!_.isEmpty(color)) {
             color = decodeURIComponent(color);
-            
+
             if (color.indexOf("rgb") == 0) {
                 color = CUI.util.color.RGBAToHex(color);
             }
-            
+
             $colorPicker.val(color);
         }
-        
+
         adjustHeader($dialog);
 
-        $dialog.createElement("input"); //input element, text  // not working
-        $dialog.setAttribute('type',"text");
-        $dialog.setAttribute('name',"username");
-        $dialog.setAttribute('value',"default");
-        new XMLSerializer().serializeToString(i);
-
         $addColor.click(sendDataMessage);
-        $testbtn.click(window.alert("sdfgsdfg sdfg "))
+        // $testbtn.onclick(sendCancelMessage())
         $removeColor.click(sendRemoveMessage);
     }
 
@@ -334,42 +380,42 @@
 
         parent.postMessage(JSON.stringify(message), "*");
     }
-    
+
     function adjustHeader($dialog) {
         var $header = $dialog.find(".coral-Dialog-header");
         if (_.isEmpty($header)) {
             $header = $dialog.find(".coral3-Dialog-header");
         }
-        
+
         $header.find(".cq-dialog-submit").remove();
-        
+
         $header.find(".cq-dialog-cancel").click(function (event) {
             event.preventDefault();
-            
+
             $dialog.remove();
-            
+
             sendCancelMessage();
         });
     }
-    
+
     function sendCancelMessage() {
         var message = {
             sender: SENDER,
             action: "cancel"
         };
-        
+
         parent.postMessage(JSON.stringify(message), "*");
     }
-    
+
     function sendRemoveMessage() {
         var message = {
             sender: SENDER,
             action: "remove"
         };
-        
+
         parent.postMessage(JSON.stringify(message), "*");
     }
-    
+
     function sendDataMessage() {
         var message = {
                 sender: SENDER,
@@ -377,18 +423,19 @@
                 data: {}
             },
             $dialog, color;
-        
+
         $dialog = $("." + DIALOG_CLASS);
-        
+
         color = $dialog.find("[name='./" + COLOR + "']").val();
-        
+
         if (color && color.indexOf("rgb") >= 0) {
             color = CUI.util.color.RGBAToHex(color);
         }
-        
+
         message.data[COLOR] = color;
-        
+
         parent.postMessage(JSON.stringify(message), "*");
     }
-    
+
+
 })(jQuery, jQuery(document));
